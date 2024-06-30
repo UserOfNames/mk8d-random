@@ -99,6 +99,7 @@ full_course_list = [
     [96, 352, "GBA  Boo Lake"],
 ]
 
+
 list_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'list.json')
 
 
@@ -150,7 +151,6 @@ def reset_course_list():
     old_list = course_list.copy()
     overwrite_list(full_course_list)
     course_list = full_course_list.copy()
-    tiered_list = []
 
 
 def undo():
@@ -253,7 +253,7 @@ def remove_course():
         print("Error: Invalid key")
 
 
-def chunk(course_list, prix_size):
+def chunk(prix_size):
     chunked = []
     length = len(course_list)
     chunk_size = length // prix_size
@@ -269,12 +269,16 @@ def chunk(course_list, prix_size):
 
 def make_tiered_list():
 
+    if len(course_list) == 0:
+        print("The course list is empty. Resetting.")
+        reset_course_list()
+
     user_input = input("Enter the size of the prix: 4/6/8/12/16/24/32/48: ")
     if user_input not in ['4', '6', '8', '12', '16', '24', '32', '48']:
         print("Error: Invalid prix size. Resuming normal generation.")
     prix_size = int(user_input)
 
-    chunked_list = chunk(course_list, prix_size)
+    chunked_list = chunk(prix_size)
     tiered_list = []
 
     for sublist in chunked_list:
@@ -335,7 +339,7 @@ List editing:
  remove: Remove a course from the current cycle.
 
 Special:
-  tiered: Pick a prix size N. Evenly split the list into tiers
+  tier: Pick a prix size N. Evenly split the list into tiers
           of size N. Pick one random course from each tier
           removing that course from the FULL list as you go.
           After drawing one course from each tier, return to
@@ -367,6 +371,7 @@ while True:
 
         case "reset":
             reset_course_list()
+            tiered_list = []
             print("Course list reset.")
             continue
 
@@ -382,7 +387,7 @@ while True:
             remove_course()
             continue
 
-        case "tiered":
+        case "tier":
             try:
                 if is_tiered:
                     user_input = input("You are already using a tiered list. Resume normal generation? 'y' to confirm: ")
