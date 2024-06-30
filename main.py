@@ -145,10 +145,12 @@ def print_used_courses():
 def reset_course_list():
     global old_list
     global course_list
+    global tiered_list
 
     old_list = course_list.copy()
     overwrite_list(full_course_list)
     course_list = full_course_list.copy()
+    tiered_list = []
 
 
 def undo():
@@ -265,7 +267,13 @@ def chunk(course_list, prix_size):
     return chunked
 
 
-def make_tiered_list(course_list, prix_size):
+def make_tiered_list():
+
+    user_input = input("Enter the size of the prix: 4/6/8/12/16/24/32/48: ")
+    if user_input not in ['4', '6', '8', '12', '16', '24', '32', '48']:
+        print("Error: Invalid prix size. Resuming normal generation.")
+    prix_size = int(user_input)
+
     chunked_list = chunk(course_list, prix_size)
     tiered_list = []
 
@@ -280,28 +288,12 @@ def generate_tiered_course():
     global old_list
     global course_list
 
-    user_input = input("Enter the size of the prix: 4/6/8/12/16/24/32/48: ")
-    if user_input not in ['4', '6', '8', '12', '16', '24', '32', '48']:
-        print("Error: Invalid prix size. Resuming normal generation.")
-        return
-
-    prix_size = int(user_input)
-    tiered_list = make_tiered_list(course_list, prix_size)
-    print(tiered_list)
-
-    while len(tiered_list) > 0:
-        old_list = course_list.copy()
-        course = tiered_list[random.randrange(len(tiered_list))]
-        course_list.remove(course)
-        print(f"({course[1]}) {course[2]}")
-        overwrite_list(course_list)
-
-    user_input = input("Tiered list empty. Make a new one? 'y' to confirm: ").lower()
-    if user_input == "y":
-        generate_tiered_course()
-
-    print("Resuming normal generation.")
-    return
+    old_list = course_list.copy()
+    index = random.randrange(len(tiered_list))
+    course = tiered_list.pop(index)
+    course_list.remove(course)
+    print(f"({course[1]}) {course[2]}")
+    overwrite_list(course_list)
 
 
 def generate_normal_course():
@@ -320,6 +312,10 @@ try:
 except:
     overwrite_list(full_course_list)
     course_list = full_course_list.copy()
+
+
+is_tiered = False
+tiered_list = []
 
 
 help_block = '''
@@ -344,6 +340,8 @@ Special:
           removing that course from the FULL list as you go.
           After drawing one course from each tier, return to
           standard generation (will notify when this happens).
+          If you are already using a tiered list, this will abort
+          and resume normal genration.
 '''
 
 
@@ -386,7 +384,19 @@ while True:
 
         case "tiered":
             try:
-                generate_tiered_course()
+                if is_tiered:
+                    user_input = input("You are already using a tiered list. Resume normal generation? 'y' to confirm: ")
+                    if user_input == "y":
+                        tiered_list = []
+                        is_tiered = False
+                        continue
+                    print("Continuing with tiered generation.")
+                    continue
+                
+                tiered_list = make_tiered_list()
+                print("You are now using a tiered list.")
+                is_tiered = True
+
             except ChunkSizeError:
                 print("Error: Remaining courses cannot be evenly divided by that number")
             finally:
@@ -394,7 +404,22 @@ while True:
 
         case "":
             try:
+                if is_tiered:
+                    if len(tiered_list) == 0:
+                        user_input = input("The tiered list is empty. Make a new one? 'y' to confirm: ")
+                        if user_input == "y":
+                            tiered_list = make_tiered_list()
+                            continue
+
+                        print("Resuming normal generation.")
+                        is_tiered = False
+                        continue
+
+                    generate_tiered_course()
+                    continue
+
                 generate_normal_course()
+
             except ValueError:
                 print("The course list is empty. Resetting.")
                 reset_course_list()
