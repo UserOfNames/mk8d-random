@@ -1,106 +1,109 @@
 import random, os, json
 
 full_course_list = [
-    # Coordinate (row cup course), rank, name
-    [314, 1, "Wii Coconut Mall"],
-    [354, 2, "Wii Maple Treeway"],
-    [241, 3, "DS Tick Tock Clock"],
-    [434, 4, "MK8 Squeaky Clean Sprint"],
-    [211, 5, "Wii Moo Moo Meadows"],
-    [362, 6, "DS Peach Gardens"],
-    [433, 7, "Wii Moonview Highway"],
-    [413, 8, "Wii DK Summit"],
-    [253, 9, "MK8 Ice Ice Outpost"],
-    [334, 10, "DS Waluigi Pinball"],
-    [233, 11, "3DS Music Park"],
-    [344, 12, "MK8 Sky-High Sundae"],
-    [232, 13, "GCN Sherbet Land"],
-    [464, 14, "Wii Rainbow Road"],
-    [324, 15, "Tour Ninja Hideaway"],
-    [353, 16, "3DS Rock Rock Mountain"],
-    [131, 17, "MK8 Sunshine Airport"],
-    [234, 18, "N64 Yoshi Valley"],
-    [343, 19, "Wii Mushroom Gorge"],
-    [244, 20, "N64 Rainbow Road"],
-    [443, 21, "Wii Koopa Cape"],
-    [322, 22, "DS Shroom Ridge"],
-    [214, 23, "N64 Toad's Turnpike"],
-    [134, 24, "MK8 Mount Wario"],
-    [141, 25, "MK8 Cloudtop Cruise"],
-    [432, 26, "GCN Daisy Cruiser"],
-    [163, 27, "MK8 Wild Woods"],
-    [364, 28, "3DS Rainbow Road"],
-    [333, 29, "N64 Kalimari Desert"],
-    [323, 30, "GBA Sky Garden"],
-    [462, 31, "3DS Rosalina's Ice World"],
-    [414, 32, "MK8 Yoshi's Island"],
-    [453, 33, "Wii Daisy Circuit"],
-    [122, 34, "MK8 Toad Harbor"],
-    [264, 35, "MK8 Big Blue"],
-    [154, 36, "MK8 Mute City"],
-    [251, 37, "Wii Wario's Gold Mine"],
-    [452, 38, "GCN DK Mountain"],
-    [263, 39, "MK8 Super Bell Subway"],
-    [114, 40, "MK8 Thwomp Ruins"],
-    [143, 41, "MK8 Bowser's Castle"],
-    [213, 42, "DS Cheep Cheep Beach"],
-    [254, 43, "MK8 Hyrule Circuit"],
-    [312, 44, "3DS Toad Circuit"],
-    [243, 45, "Wii Grumble Volcano"],
-    [153, 46, "MK8 Dragon Driftway"],
-    [454, 47, "MK8 Piranha Plant Cove"],
-    [144, 48, "MK8 Rainbow Road"],
-    [242, 49, "3DS Piranha Plant Slide"],
-    [224, 50, "3DS DK Jungle"],
-    [132, 51, "MK8 Dolphin Shoals"],
-    [423, 52, "GCN Waluigi Stadium"],
-    [112, 53, "MK8 Water Park"],
-    [223, 54, "N64 Royal Raceway"],
-    [421, 55, "Tour Bangkok Rush"],
-    [123, 56, "MK8 Twisted Mansion"],
-    [342, 57, "GBA Snow Land"],
-    [262, 58, "GBA Ribbon Road"],
-    [152, 59, "MK8 Excitebike Arena"],
-    [461, 60, "Tour Madrid Drive"],
-    [424, 61, "Tour Singapore Speedway"],
-    [111, 62, "MK8 Mario Kart Stadium"],
-    [221, 63, "GCN Dry Dry Desert"],
-    [363, 64, "Tour Merry Mountain"],
-    [113, 65, "MK8 Sweet Sweet Canyon"],
-    [133, 66, "MK8 Electrodrome"],
-    [331, 67, "Tour New York Minute"],
-    [164, 68, "MK8 Animal Crossing Circuit"],
-    [442, 69, "GBA Sunset Wilds"],
-    [411, 70, "Tour Amsterdam Drift"],
-    [431, 71, "Tour Athens Dash"],
-    [124, 72, "MK8 Shy Guy Falls"],
-    [121, 73, "MK8 Mario Circuit"],
-    [212, 74, "GBA Mario Circuit"],
-    [361, 75, "Tour Berlin Byways"],
-    [412, 76, "GBA Riverside Park"],
-    [252, 77, "SNES Rainbow Road"],
-    [332, 78, "SNES Mario Circuit 3"],
-    [422, 79, "DS Mario Circuit"],
-    [311, 80, "Tour Paris Promenade"],
-    [313, 81, "N64 Choco Mountain"],
-    [222, 82, "SNES Donut Plains 3"],
-    [441, 83, "Tour Los Angeles Laps"],
-    [451, 84, "Tour Rome Avanti"],
-    [231, 85, "DS Wario Stadium"],
-    [161, 86, "GCN Baby Park"],
-    [142, 87, "MK8 Bone Dry Ruins"],
-    [444, 88, "Tour Vancouver Velocity"],
-    [351, 89, "Tour London Loop"],
-    [261, 90, "3DS Neo Bowser City"],
-    [151, 91, "GCN Yoshi's Circuit"],
-    [321, 92, "Tour Tokyo Blur"],
-    [341, 93, "Tour Sydney Sprint"],
-    [162, 94, "GBA Cheese Land"],
-    [463, 95, "SNES Bowser's Castle 3"],
-    [352, 96, "GBA Boo Lake"],
+    [1,  314, "Wii  Coconut Mall"],
+    [2,  354, "Wii  Maple Treeway"],
+    [3,  241, "DS   Tick Tock Clock"],
+    [4,  434, "MK8  Squeaky Clean Sprint"],
+    [5,  211, "Wii  Moo Moo Meadows"],
+    [6,  362, "DS   Peach Gardens"],
+    [7,  433, "Wii  Moonview Highway"],
+    [8,  413, "Wii  DK Summit"],
+    [9,  253, "MK8  Ice Ice Outpost"],
+    [10, 334, "DS   Waluigi Pinball"],
+    [11, 233, "3DS  Music Park"],
+    [12, 344, "MK8  Sky-High Sundae"],
+    [13, 232, "GCN  Sherbet Land"],
+    [14, 464, "Wii  Rainbow Road"],
+    [15, 324, "Tour Ninja Hideaway"],
+    [16, 353, "3DS  Rock Rock Mountain"],
+    [17, 131, "MK8  Sunshine Airport"],
+    [18, 234, "N64  Yoshi Valley"],
+    [19, 343, "Wii  Mushroom Gorge"],
+    [20, 244, "N64  Rainbow Road"],
+    [21, 443, "Wii  Koopa Cape"],
+    [22, 322, "DS   Shroom Ridge"],
+    [23, 214, "N64  Toad's Turnpike"],
+    [24, 134, "MK8  Mount Wario"],
+    [25, 141, "MK8  Cloudtop Cruise"],
+    [26, 432, "GCN  Daisy Cruiser"],
+    [27, 163, "MK8  Wild Woods"],
+    [28, 364, "3DS  Rainbow Road"],
+    [29, 333, "N64  Kalimari Desert"],
+    [30, 323, "GBA  Sky Garden"],
+    [31, 462, "3DS  Rosalina's Ice World"],
+    [32, 414, "MK8  Yoshi's Island"],
+    [33, 453, "Wii  Daisy Circuit"],
+    [34, 122, "MK8  Toad Harbor"],
+    [35, 264, "MK8  Big Blue"],
+    [36, 154, "MK8  Mute City"],
+    [37, 251, "Wii  Wario's Gold Mine"],
+    [38, 452, "GCN  DK Mountain"],
+    [39, 263, "MK8  Super Bell Subway"],
+    [40, 114, "MK8  Thwomp Ruins"],
+    [41, 143, "MK8  Bowser's Castle"],
+    [42, 213, "DS   Cheep Cheep Beach"],
+    [43, 254, "MK8  Hyrule Circuit"],
+    [44, 312, "3DS  Toad Circuit"],
+    [45, 243, "Wii  Grumble Volcano"],
+    [46, 153, "MK8  Dragon Driftway"],
+    [47, 454, "MK8  Piranha Plant Cove"],
+    [48, 144, "MK8  Rainbow Road"],
+    [49, 242, "3DS  Piranha Plant Slide"],
+    [50, 224, "3DS  DK Jungle"],
+    [51, 132, "MK8  Dolphin Shoals"],
+    [52, 423, "GCN  Waluigi Stadium"],
+    [53, 112, "MK8  Water Park"],
+    [54, 223, "N64  Royal Raceway"],
+    [55, 421, "Tour Bangkok Rush"],
+    [56, 123, "MK8  Twisted Mansion"],
+    [57, 342, "GBA  Snow Land"],
+    [58, 262, "GBA  Ribbon Road"],
+    [59, 152, "MK8  Excitebike Arena"],
+    [60, 461, "Tour Madrid Drive"],
+    [61, 424, "Tour Singapore Speedway"],
+    [62, 111, "MK8  Mario Kart Stadium"],
+    [63, 221, "GCN  Dry Dry Desert"],
+    [64, 363, "Tour Merry Mountain"],
+    [65, 113, "MK8  Sweet Sweet Canyon"],
+    [66, 133, "MK8  Electrodrome"],
+    [67, 331, "Tour New York Minute"],
+    [68, 164, "MK8  Animal Crossing Circuit"],
+    [69, 442, "GBA  Sunset Wilds"],
+    [70, 411, "Tour Amsterdam Drift"],
+    [71, 431, "Tour Athens Dash"],
+    [72, 124, "MK8  Shy Guy Falls"],
+    [73, 121, "MK8  Mario Circuit"],
+    [74, 212, "GBA  Mario Circuit"],
+    [75, 361, "Tour Berlin Byways"],
+    [76, 412, "GBA  Riverside Park"],
+    [77, 252, "SNES Rainbow Road"],
+    [78, 332, "SNES Mario Circuit 3"],
+    [79, 422, "DS   Mario Circuit"],
+    [80, 311, "Tour Paris Promenade"],
+    [81, 313, "N64  Choco Mountain"],
+    [82, 222, "SNES Donut Plains 3"],
+    [83, 441, "Tour Los Angeles Laps"],
+    [84, 451, "Tour Rome Avanti"],
+    [85, 231, "DS   Wario Stadium"],
+    [86, 161, "GCN  Baby Park"],
+    [87, 142, "MK8  Bone Dry Ruins"],
+    [88, 444, "Tour Vancouver Velocity"],
+    [89, 351, "Tour London Loop"],
+    [90, 261, "3DS  Neo Bowser City"],
+    [91, 151, "GCN  Yoshi's Circuit"],
+    [92, 321, "Tour Tokyo Blur"],
+    [93, 341, "Tour Sydney Sprint"],
+    [94, 162, "GBA  Cheese Land"],
+    [95, 463, "SNES Bowser's Castle 3"],
+    [96, 352, "GBA  Boo Lake"],
 ]
 
 list_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'list.json')
+
+
+class ChunkSizeError(Exception):
+    pass
 
 
 def overwrite_list(course_list):
@@ -114,35 +117,28 @@ def read_list():
         return course_list
 
 
-def chunk(course_list, prix_size):
-    chunked = []
-    length = len(course_list)
-    chunk_size = length // prix_size
-
-    if chunk_size != length / prix_size:
-        print("Error: Remaining courses cannot be evenly divided into given prix size")
-        return
-
-    for i in range(0, length, chunk_size):
-        chunked.append(course_list[i:i+chunk_size])
-
-    return chunked
-
-
 def get_used_courses():
-    return sorted(list(set(course_list).symmetric_difference(set(full_course_list))))
+    used_courses = []
+    symmetric_difference = set(course[0] for course in course_list) ^ set(course[0] for course in full_course_list)
+
+    for course in full_course_list:
+        if course[0] in symmetric_difference:
+            used_courses.append(course)
+
+    used_courses.sort(key=lambda x: x[0])
+    return used_courses
 
 
 def print_remaining_courses():
-    for course in sorted(course_list, key=lambda x: x[0]):
-        print(course)
+    for course in sorted(course_list, key=lambda x: x[1]):
+        print(f"({course[1]}) {course[2]}")
     print(f"{len(course_list)} courses remaining.")
 
 
 def print_used_courses():
     used_course_list = get_used_courses()
-    for course in sorted(used_course_list, key=lambda x: x[0]):
-        print(course)
+    for course in sorted(used_course_list, key=lambda x: x[1]):
+        print(f"({course[1]}) {course[2]}")
     print(f"{96-len(course_list)} courses used.")
 
 
@@ -189,8 +185,8 @@ def add_course():
         print("Error: No matches found.")
         return
 
-    for key, value in matches.items():
-        print(f"{key}: {value}")
+    for key, match in matches.items():
+        print(f"{key}: ({match[1]}) {match[2]}")
 
     try:
         user_input = input("Enter the key associated with the course you want to remove ('all' to add all matches): ").lower()
@@ -198,12 +194,12 @@ def add_course():
         if user_input == "all":
             for match in matches.values():
                 course_list.append(match)
-            course_list.sort(key=lambda x: x[1])
+            course_list.sort(key=lambda x: x[0])
             overwrite_list(course_list)
 
         index = int(user_input)
         course_list.append(matches[index])
-        course_list.sort(key=lambda x: x[1])
+        course_list.sort(key=lambda x: x[0])
         overwrite_list(course_list)
 
     except ValueError:
@@ -221,7 +217,7 @@ def remove_course():
     i = 1
 
     user_input = input("Search for a course (blank will search all used courses): ").lower()
-    for course in course_list:
+    for course in sorted(course_list, key=lambda x: x[1]):
         if user_input in course[2].lower():
             matches[i] = course
             i += 1
@@ -231,7 +227,7 @@ def remove_course():
         return
 
     for key, match in matches.items():
-        print(f"{key}: {match}")
+        print(f"{key}: ({match[1]}) {match[2]}")
 
     try:
         user_input = input("Enter the key associated with the course you want to remove ('all' to remove all matches): ").lower()
@@ -240,12 +236,12 @@ def remove_course():
             for match in matches.values():
                 course_list.remove(match)
             overwrite_list(course_list)
-            course_list.sort(key=lambda x: x[1])
+            course_list.sort(key=lambda x: x[0])
             return course_list
 
         index = int(user_input)
         course_list.remove(matches[index])
-        course_list.sort(key=lambda x: x[1])
+        course_list.sort(key=lambda x: x[0])
         overwrite_list(course_list)
         return course_list
 
@@ -253,6 +249,20 @@ def remove_course():
         print("Error: Not a number")
     except KeyError:
         print("Error: Invalid key")
+
+
+def chunk(course_list, prix_size):
+    chunked = []
+    length = len(course_list)
+    chunk_size = length // prix_size
+
+    if chunk_size != length / prix_size:
+        raise ChunkSizeError
+
+    for i in range(0, length, chunk_size):
+        chunked.append(course_list[i:i+chunk_size])
+
+    return chunked
 
 
 def make_tiered_list(course_list, prix_size):
@@ -277,12 +287,13 @@ def generate_tiered_course():
 
     prix_size = int(user_input)
     tiered_list = make_tiered_list(course_list, prix_size)
+    print(tiered_list)
 
     while len(tiered_list) > 0:
         old_list = course_list.copy()
         course = tiered_list[random.randrange(len(tiered_list))]
         course_list.remove(course)
-        print(course)
+        print(f"({course[1]}) {course[2]}")
         overwrite_list(course_list)
 
     user_input = input("Tiered list empty. Make a new one? 'y' to confirm: ").lower()
@@ -300,7 +311,7 @@ def generate_normal_course():
     old_list = course_list.copy()
     index = random.randrange(len(course_list))
     course = course_list.pop(index)
-    print(course)
+    print(f"({course[1]}) {course[2]}")
     overwrite_list(course_list)
 
 
@@ -374,17 +385,21 @@ while True:
             continue
 
         case "tiered":
-            generate_tiered_course()
-            continue
+            try:
+                generate_tiered_course()
+            except ChunkSizeError:
+                print("Error: Remaining courses cannot be evenly divided by that number")
+            finally:
+                continue
 
         case "":
-            # FIXME len 0 error
-            generate_normal_course()
-            continue
+            try:
+                generate_normal_course()
+            except ValueError:
+                print("The course list is empty. Resetting.")
+                reset_course_list()
+            finally:
+                continue
 
-    if len(course_list) == 0:
-        print("The course list is empty. Resetting.")
-        reset_course_list()
-        continue
 
     print("Error: Invalid input")
