@@ -317,16 +317,6 @@ except:
         pickle.dump(full_course_list.course_list, wfile, pickle.HIGHEST_PROTOCOL)
     active_course_list = CourseList(full_course_list.course_list)
 
-# testlist = [
-#     Course(1,  314, "Wii  Coconut Mall"),
-#     Course(2,  354, "Wii  Maple Treeway"),
-#     Course(3,  241, "DS   Tick Tock Clock"),
-#     Course(4,  434, "MK8  Squeaky Clean Sprint"),
-#     Course(5,  211, "Wii  Moo Moo Meadows"),
-#     Course(6,  362, "DS   Peach Gardens"),
-# ]
-# active_course_list = CourseList(testlist)
-
 
 print("Enter 'help' for commands.")
 while True:
