@@ -1,6 +1,6 @@
 import random, os, pickle
 
-class ChunkSizeError(Exception):
+class SizeError(Exception):
     pass
 
 
@@ -26,6 +26,7 @@ class CourseList():
     def __init__(self, course_list=[]):
         self.course_list = course_list
         self.old_list = course_list.copy()
+        self.is_tiered = False
 
 
     def __xor__(self, other):
@@ -41,6 +42,9 @@ class CourseList():
 
 
     def overwrite_persistent_list(self):
+        if self.is_tiered:
+            return
+
         with open(list_file, 'wb') as wfile:
             pickle.dump(self.course_list, wfile, pickle.HIGHEST_PROTOCOL)
 
@@ -139,9 +143,21 @@ class CourseList():
 
 class TieredList(CourseList):
     def __init__(self, prix_size, course_list = []):
-        super().__init__(course_list)
+        self.course_list, self.original_course_list = course_list, course_list
         self.prix_size = prix_size
-        self.course_list_backup = self.course_list.copy()
+        self.is_tiered = True
+
+        if len(self.course_list) == 0:
+            raise EmptyListError
+
+        chunked_list = self.chunk_list(prix_size)
+        self.tiered_list = []
+
+        for sublist in chunked_list:
+            index = random.randrange(len(sublist))
+            self.tiered_list.append(sublist[index])
+
+        self.course_list = self.tiered_list.copy()
 
 
     def chunk_list(self, size):
@@ -150,7 +166,7 @@ class TieredList(CourseList):
         chunk_size = length // size
 
         if chunk_size != length / size:
-            raise ChunkSizeError
+            raise SizeError("Error: Cannot evenly divide the course list by that number.")
 
         for i in range(0, length, chunk_size):
             chunked.append(self.course_list[i:i+chunk_size])
@@ -158,15 +174,9 @@ class TieredList(CourseList):
         return chunked
 
 
-    def make_tiered_list(self):
-        if len(self.course_list) == 0:
-            raise EmptyListError
-
-
 def reset_active_list():
     active_course_list.backup_list()
     active_course_list.course_list = full_course_list.course_list.copy()
-    active_course_list.overwrite_persistent_list()
 
 
 full_course_list = CourseList([
@@ -313,8 +323,10 @@ while True:
     user_input = input(":> ").lower()
     used_courses = active_course_list ^ full_course_list
 
+
     if user_input in ['q', 'quit', 'exit']:
         break
+
 
     try:
         match user_input:
@@ -369,7 +381,21 @@ while True:
 
 
             case "tier":
-                pass
+                if active_course_list.is_tiered:
+                    exit_tiered = input("Already using a tiered list. Resume normal generation? 'y' to confirm (this will prevent the course list from updating!): ").lower()
+                    if exit_tiered == "y":
+                        print("Resuming normal generation.")
+                        active_course_list = CourseList(active_course_list.original_course_list)
+                        continue
+                    else:
+                        print("Continuing tiered generation.")
+
+                prix_size = input("Enter the size of the prix: 4/6/8/12/16/24/32/48: ")
+                if prix_size not in ['4', '6', '8', '12', '16', '24', '32', '48']:
+                    raise SizeError("Error: Invalid prix size.")
+                prix_size = int(prix_size)
+
+                active_course_list = TieredList(prix_size, active_course_list.course_list)
 
 
             case "":
@@ -382,88 +408,26 @@ while True:
 
 
     except EmptyListError:
-        print("The course list is empty. Resetting.")
-        reset_active_list()
-        active_course_list.overwrite_persistent_list()
+        if active_course_list.is_tiered:
+            confirm_save_tiered_changes = input("The tiered list is empty. Resuming normal generation. Remove tiered courses from the main list? 'n' to deny: ").lower()
+            if confirm_save_tiered_changes == "n":
+                active_course_list = CourseList(active_course_list.original_course_list)
+            else:
+                active_course_list = CourseList(active_course_list.original_course_list) ^ CourseList(active_course_list.tiered_list)
+
+            active_course_list.overwrite_persistent_list()
+
+
+        else:
+            print("The course list is empty. Resetting.")
+            reset_active_list()
+            active_course_list.overwrite_persistent_list()
 
     except NoMatchError:
         print("Error: No matches found.")
 
+    except SizeError as err:
+        print(err)
 
-# def make_tiered_list():
-#
-#     if len(course_list) == 0:
-#         print("The course list is empty. Resetting.")
-#         reset_course_list()
-#
-#     user_input = input("Enter the size of the prix: 4/6/8/12/16/24/32/48: ")
-#     if user_input not in ['4', '6', '8', '12', '16', '24', '32', '48']:
-#         print("Error: Invalid prix size. Resuming normal generation.")
-#     prix_size = int(user_input)
-#
-#     chunked_list = chunk(prix_size)
-#     tiered_list = []
-#
-#     for sublist in chunked_list:
-#         index = random.randrange(len(sublist))
-#         tiered_list.append(sublist[index])
-#
-#     return tiered_list
-#
-#
-# def generate_tiered_course():
-#     global old_list
-#     global course_list
-#
-#     old_list = course_list.copy()
-#     index = random.randrange(len(tiered_list))
-#     course = tiered_list.pop(index)
-#     course_list.remove(course)
-#     print(f"({course[1]}) {course[2]}")
-#     overwrite_list(course_list)
-#
-#
-#
-#         case "tier":
-#             try:
-#                 if is_tiered:
-#                     user_input = input("You are already using a tiered list. Resume normal generation? 'y' to confirm: ")
-#                     if user_input == "y":
-#                         tiered_list = []
-#                         is_tiered = False
-#                         continue
-#                     print("Continuing with tiered generation.")
-#                     continue
-#
-#                 tiered_list = make_tiered_list()
-#                 print("You are now using a tiered list.")
-#                 is_tiered = True
-#
-#             except ChunkSizeError:
-#                 print("Error: Remaining courses cannot be evenly divided by that number")
-#             finally:
-#                 continue
-#
-#         case "":
-#             try:
-#                 if is_tiered:
-#                     if len(tiered_list) == 0:
-#                         user_input = input("The tiered list is empty. Make a new one? 'y' to confirm: ")
-#                         if user_input == "y":
-#                             tiered_list = make_tiered_list()
-#                             continue
-#
-#                         print("Resuming normal generation.")
-#                         is_tiered = False
-#                         continue
-#
-#                     generate_tiered_course()
-#                     continue
-#
-#                 generate_normal_course()
-#
-#             except ValueError:
-#                 print("The course list is empty. Resetting.")
-#                 reset_course_list()
-#             finally:
-#                 continue
+    except:
+        print("I don't know what you just did, but you generated an error I didn't anticipate. Congratulations.")
