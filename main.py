@@ -306,7 +306,7 @@ Special:
 '''
 
 
-list_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'list.json')
+list_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'list.pkl')
 
 
 try:
