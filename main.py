@@ -88,7 +88,7 @@ class CourseList():
             self.course_list.remove(course)
 
 
-    def search_and_add(self):
+    def search_and_add(self, used_courses):
         search_key = input("Search for a course (blank will search all courses): ")
         matches = used_courses.search_list(search_key)
 
@@ -358,7 +358,7 @@ while True:
 
             case "add":
                 try:
-                    active_course_list.search_and_add()
+                    active_course_list.search_and_add(used_courses)
                     active_course_list.overwrite_persistent_list()
                     print("Course added successfully.")
 
