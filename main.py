@@ -4,6 +4,14 @@ class ChunkSizeError(Exception):
     pass
 
 
+class EmptyListError(Exception):
+    pass
+
+
+class NoMatchError(Exception):
+    pass
+
+
 class Course():
     def __init__(self, rank, coord, name):
         self.rank = rank
@@ -15,9 +23,8 @@ class Course():
 
 
 class CourseList():
-    def __init__(self, course_list=[], is_tiered=False):
+    def __init__(self, course_list=[]):
         self.course_list = course_list
-        self.is_tiered = is_tiered
         self.old_list = course_list.copy()
 
 
@@ -69,31 +76,72 @@ class CourseList():
         for course in args:
             self.course_list.append(course)
         self.course_list.sort(key=lambda x: x.rank)
-        self.overwrite_persistent_list()
 
 
     def remove_course(self, *args):
         self.backup_list()
         for course in args:
             self.course_list.remove(course)
-        self.overwrite_persistent_list()
+
+
+    def search_and_add(self):
+        search_key = input("Search for a course (blank will search all courses): ")
+        matches = used_courses.search_list(search_key)
+
+        if len(matches) == 0:
+            raise NoMatchError
+
+        for key, course in matches.items(): print(f"{key}: {course}")
+
+        key_selection = input("Enter the key associated with the course you want to add ('all' to add all matches): ").lower()
+
+        if key_selection == "all":
+            for course in matches.values(): active_course_list.add_course(course)
+            return
+
+        index = int(key_selection)
+        active_course_list.add_course(matches[index])
+
+
+    def search_and_remove(self):
+        search_key = input("Search for a course (blank will search all courses): ")
+        matches = active_course_list.search_list(search_key)
+
+        if len(matches) == 0:
+            raise NoMatchError
+
+        for key, course in matches.items(): print(f"{key}: {course}")
+
+        key_selection = input("Enter the key associated with the course you want to remove ('all' to remove all matches): ").lower()
+
+        if key_selection == "all":
+            for course in matches.values(): active_course_list.remove_course(course)
+            return
+
+        index = int(key_selection)
+        active_course_list.remove_course(matches[index])
 
 
     def undo_last_action(self):
-        try:
-            old_list_temp = self.old_list.copy()
-            self.backup_list()
-            self.course_list = old_list_temp
-            self.overwrite_persistent_list()
-        except:
-            print("Error: You probably haven't done an undoable action.")
+        old_list_temp = self.old_list.copy()
+        self.backup_list()
+        self.course_list = old_list_temp
 
 
     def generate_course(self):
+        if len(self.course_list) == 0:
+            raise EmptyListError
+
         course = self.course_list[random.randrange(len(self.course_list))]
         print(course)
         self.remove_course(course)
-        self.overwrite_persistent_list()
+
+
+class TieredList(CourseList):
+    def __init__(self, prix_size, course_list = []):
+        super().__init__(course_list)
+        self.prix_size = prix_size
+        self.course_list_backup = self.course_list.copy()
 
 
     def chunk_list(self, size):
@@ -110,7 +158,15 @@ class CourseList():
         return chunked
 
 
-list_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'list.json')
+    def make_tiered_list(self):
+        if len(self.course_list) == 0:
+            raise EmptyListError
+
+
+def reset_active_list():
+    active_course_list.backup_list()
+    active_course_list.course_list = full_course_list.course_list.copy()
+    active_course_list.overwrite_persistent_list()
 
 
 full_course_list = CourseList([
@@ -213,15 +269,6 @@ full_course_list = CourseList([
 ])
 
 
-try:
-    with open(list_file, 'rb') as rfile:
-        active_course_list = CourseList(pickle.load(rfile))
-except:
-    with open(list_file, 'wb') as wfile:
-        pickle.dump(full_course_list.course_list, wfile, pickle.HIGHEST_PROTOCOL)
-    active_course_list = CourseList(full_course_list.course_list)
-
-
 help_block = '''
 q/quit/exit: Stop the script.
 To avoid accidental generation, any input besides these commands will do nothing.
@@ -249,6 +296,18 @@ Special:
 '''
 
 
+list_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'list.json')
+
+
+try:
+    with open(list_file, 'rb') as rfile:
+        active_course_list = CourseList(pickle.load(rfile))
+except:
+    with open(list_file, 'wb') as wfile:
+        pickle.dump(full_course_list.course_list, wfile, pickle.HIGHEST_PROTOCOL)
+    active_course_list = CourseList(full_course_list.course_list)
+
+
 print("Enter 'help' for commands.")
 while True:
     user_input = input(":> ").lower()
@@ -257,99 +316,78 @@ while True:
     if user_input in ['q', 'quit', 'exit']:
         break
 
-    match user_input:
-        case "help":
-            print(help_block)
-            continue
+    try:
+        match user_input:
+            case "help":
+                print(help_block)
 
 
-        case "remaining":
-            active_course_list.print_list()
-            print(f"There are {len(active_course_list.course_list)} courses in the list.")
-            continue
+            case "remaining":
+                active_course_list.print_list()
+                print(f"There are {len(active_course_list.course_list)} courses in the list.")
 
 
-        case "used":
-            used_courses.print_list()
-            print(f"{len(used_courses.course_list)} courses have been used.")
-            continue
+            case "used":
+                used_courses.print_list()
+                print(f"{len(used_courses.course_list)} courses have been used.")
 
 
-        case "reset":
-            active_course_list.backup_list()
-            active_course_list.course_list = full_course_list.course_list.copy()
-            active_course_list.overwrite_persistent_list()
-            print("Course list reset.")
-            continue
+            case "reset":
+                reset_active_list()
+                active_course_list.overwrite_persistent_list()
+                print("Course list reset.")
 
 
-        case "undo":
-            active_course_list.undo_last_action()
-            continue
+            case "undo":
+                active_course_list.undo_last_action()
+                active_course_list.overwrite_persistent_list()
+                print("Previous action undone.")
 
 
-        case "add":
-            search_key = input("Search for a course (blank will search all courses): ")
-            matches = used_courses.search_list(search_key)
+            case "add":
+                try:
+                    active_course_list.search_and_add()
+                    active_course_list.overwrite_persistent_list()
+                    print("Course added successfully.")
 
-            if len(matches) == 0:
-                print("Error: No matches found.")
-                continue
-
-            for key, match in matches.items(): print(f"{key}: {match}")
-
-            try:
-                key_selection = input("Enter the key associated with the course you want to add ('all' to add all matches): ").lower()
-
-                if key_selection == "all":
-                    for match in matches.values(): active_course_list.add_course(match)
-                    continue
-
-                index = int(key_selection)
-                active_course_list.add_course(matches[index])
-
-            except ValueError:
-                print("Error: Not a number")
-            except KeyError:
-                print("Error: Invalid key")
-            finally:
-                continue
+                except ValueError:
+                    print("Error: Not a number.")
+                except KeyError:
+                    print("Error: Invalid key.")
 
 
-        case "remove":
-            search_key = input("Search for a course (blank will search all courses): ")
-            matches = active_course_list.search_list(search_key)
+            case "remove":
+                try:
+                    active_course_list.search_and_remove()
+                    active_course_list.overwrite_persistent_list()
+                    print("Course removed successfully.")
 
-            if len(matches) == 0:
-                print("Error: No matches found.")
-                continue
-
-            for key, match in matches.items(): print(f"{key}: {match}")
-
-            try:
-                key_selection = input("Enter the key associated with the course you want to remove ('all' to remove all matches): ").lower()
-
-                if key_selection == "all":
-                    for match in matches.values(): active_course_list.remove_course(match)
-                    continue
-
-                index = int(key_selection)
-                active_course_list.remove_course(matches[index])
-
-            except ValueError:
-                print("Error: Not a number")
-            except KeyError:
-                print("Error: Invalid key")
-            finally:
-                continue
+                except ValueError:
+                    print("Error: Not a number.")
+                except KeyError:
+                    print("Error: Invalid key.")
 
 
-        case "":
-            active_course_list.generate_course()
-            continue
+            case "tier":
+                pass
 
 
-    print("Error: Invalid input.")
+            case "":
+                active_course_list.generate_course()
+                active_course_list.overwrite_persistent_list()
+            
+
+            case _:
+                print("Error: Invalid input.")
+
+
+    except EmptyListError:
+        print("The course list is empty. Resetting.")
+        reset_active_list()
+        active_course_list.overwrite_persistent_list()
+
+    except NoMatchError:
+        print("Error: No matches found.")
 
 
 # def make_tiered_list():
