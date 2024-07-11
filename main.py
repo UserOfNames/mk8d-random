@@ -28,6 +28,9 @@ class CourseList():
         self.old_list = course_list.copy()
         self.is_tiered = False
 
+        self.untiered_course_list = course_list
+        self.tiered_list = []
+
 
     def __xor__(self, other):
         symdiff = []
@@ -143,7 +146,7 @@ class CourseList():
 
 class TieredList(CourseList):
     def __init__(self, prix_size, course_list = []):
-        self.course_list, self.original_course_list = course_list, course_list
+        self.untiered_course_list = course_list
         self.prix_size = prix_size
         self.is_tiered = True
 
@@ -162,14 +165,14 @@ class TieredList(CourseList):
 
     def chunk_list(self, size):
         chunked = []
-        length = len(self.course_list)
+        length = len(self.untiered_course_list)
         chunk_size = length // size
 
         if chunk_size != length / size:
             raise SizeError("Error: Cannot evenly divide the course list by that number.")
 
         for i in range(0, length, chunk_size):
-            chunked.append(self.course_list[i:i+chunk_size])
+            chunked.append(self.untiered_course_list[i:i+chunk_size])
 
         return chunked
 
@@ -177,7 +180,6 @@ class TieredList(CourseList):
 def reset_active_list():
     active_course_list.backup_list()
     active_course_list.course_list = full_course_list.course_list.copy()
-
 
 full_course_list = CourseList([
     Course(1,  314, "Wii  Coconut Mall"),
@@ -286,14 +288,14 @@ To avoid accidental generation, any input besides these commands will do nothing
 Enter to generate a new course. (Blank input)
 
 Information:
-  remaining: Print a list of remaining courses.
-       used: Print a list of used courses.
+  remaining/re: Print a list of remaining courses.
+       used/ls: Print a list of used courses.
 
 List editing:
-  reset: Reset the course list.
-   undo: Undo the previous list edit. Will undo itself as well.
-    add: Add a previously generated course back into the cycle.
- remove: Remove a course from the current cycle.
+         reset: Reset the course list.
+          undo: Undo the previous list edit. Will undo itself as well.
+           add: Add a previously generated course back into the cycle.
+ remove/rm/pop: Remove a course from the current cycle.
 
 Special:
   tier: Pick a prix size N. Evenly split the list into tiers
@@ -321,27 +323,27 @@ except:
 print("Enter 'help' for commands.")
 while True:
     user_input = input(":> ").lower()
-    used_courses = active_course_list ^ full_course_list
-
-
-    if user_input in ['q', 'quit', 'exit']:
-        break
+    used_course_list = active_course_list ^ full_course_list
 
 
     try:
         match user_input:
+            case 'q' | 'quit' | 'exit':
+                break
+
+
             case "help":
                 print(help_block)
 
 
-            case "remaining":
+            case "remaining" | "re":
                 active_course_list.print_list()
                 print(f"There are {len(active_course_list.course_list)} courses in the list.")
 
 
-            case "used":
-                used_courses.print_list()
-                print(f"{len(used_courses.course_list)} courses have been used.")
+            case "used" | "ls":
+                used_course_list.print_list()
+                print(f"{len(used_course_list.course_list)} courses have been used.")
 
 
             case "reset":
@@ -358,7 +360,7 @@ while True:
 
             case "add":
                 try:
-                    active_course_list.search_and_add(used_courses)
+                    active_course_list.search_and_add(used_course_list)
                     active_course_list.overwrite_persistent_list()
                     print("Course added successfully.")
 
@@ -368,7 +370,7 @@ while True:
                     print("Error: Invalid key.")
 
 
-            case "remove":
+            case "remove" | "rm" | "pop":
                 try:
                     active_course_list.search_and_remove()
                     active_course_list.overwrite_persistent_list()
@@ -385,7 +387,7 @@ while True:
                     exit_tiered = input("Already using a tiered list. Resume normal generation? 'y' to confirm (this will prevent the course list from updating!): ").lower()
                     if exit_tiered == "y":
                         print("Resuming normal generation.")
-                        active_course_list = CourseList(active_course_list.original_course_list)
+                        active_course_list = CourseList(active_course_list.untiered_course_list)
                         continue
                     else:
                         print("Continuing tiered generation.")
@@ -411,9 +413,9 @@ while True:
         if active_course_list.is_tiered:
             confirm_save_tiered_changes = input("The tiered list is empty. Resuming normal generation. Remove tiered courses from the main list? 'n' to deny: ").lower()
             if confirm_save_tiered_changes == "n":
-                active_course_list = CourseList(active_course_list.original_course_list)
+                active_course_list = CourseList(active_course_list.untiered_course_list)
             else:
-                active_course_list = CourseList(active_course_list.original_course_list) ^ CourseList(active_course_list.tiered_list)
+                active_course_list = CourseList(active_course_list.untiered_course_list) ^ CourseList(active_course_list.tiered_list)
 
             active_course_list.overwrite_persistent_list()
 
