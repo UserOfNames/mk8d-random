@@ -32,15 +32,16 @@ class CourseList():
         self.tiered_list = []
 
 
-    def __xor__(self, other):
+    def __sub__(self, other):
         symdiff = []
         symdiff_ranks = set(course.rank for course in self.course_list) ^ set(course.rank for course in other.course_list)
 
-        for course in full_course_list.course_list:
+        for course in self.course_list:
             if course.rank in symdiff_ranks:
                 symdiff.append(course)
 
         symdiff.sort(key=lambda x: x.rank)
+
         return CourseList(symdiff)
 
 
@@ -149,6 +150,7 @@ class TieredList(CourseList):
         self.untiered_course_list = course_list
         self.prix_size = prix_size
         self.is_tiered = True
+        self.course_list = course_list
 
         if len(self.course_list) == 0:
             raise EmptyListError
@@ -183,106 +185,101 @@ def reset_active_list():
 
 full_course_list = CourseList([
     Course(1, 314, "Wii  Coconut Mall"),
-    Course(1, 354, "Wii  Maple Treeway"),
-    Course(1, 434, "MK8  Squeaky Clean Sprint"),
-    Course(1, 241, "DS   Tick Tock Clock"),
-    Course(1, 211, "Wii  Moo Moo Meadows"),
-    Course(1, 362, "DS   Peach Gardens"),
-    Course(1, 433, "Wii  Moonview Highway"),
-    Course(1, 413, "Wii  DK Summit"),
-    Course(1, 253, "MK8  Ice Ice Outpost"),
-    Course(1, 353, "3DS  Rock Rock Mountain"),
-    Course(1, 344, "MK8  Sky-High Sundae"),
-    Course(1, 131, "MK8  Sunshine Airport"),
-    Course(1, 232, "GCN  Sherbet Land"),
-    Course(1, 334, "DS   Waluigi Pinball"),
-    Course(1, 233, "3DS  Music Park"),
-    Course(1, 464, "Wii  Rainbow Road"),
-
-    Course(1, 443, "Wii  Koopa Cape"),
-    Course(1, 244, "N64  Rainbow Road"),
-    Course(1, 234, "N64  Yoshi Valley"),
-    Course(1, 343, "Wii  Mushroom Gorge"),
-    Course(1, 214, "N64  Toad's Turnpike"),
-    Course(1, 134, "MK8  Mount Wario"),
-    Course(1, 141, "MK8  Cloudtop Cruise"),
-    Course(1, 322, "DS   Shroom Ridge"),
-    Course(1, 432, "GCN  Daisy Cruiser"),
-    Course(1, 324, "Tour Ninja Hideaway"),
-    Course(1, 364, "3DS  Rainbow Road"),
-    Course(1, 251, "Wii  Wario's Gold Mine"),
-    Course(1, 163, "MK8  Wild Woods"),
-    Course(1, 333, "N64  Kalimari Desert"),
-    Course(1, 453, "Wii  Daisy Circuit"),
-    Course(1, 323, "GBA  Sky Garden"),
-
-    Course(1, 462, "3DS  Rosalina's Ice World"),
-    Course(1, 122, "MK8  Toad Harbor"),
-    Course(1, 264, "MK8  Big Blue"),
-    Course(1, 154, "MK8  Mute City"),
-    Course(1, 452, "GCN  DK Mountain"),
-    Course(1, 263, "MK8  Super Bell Subway"),
-    Course(1, 414, "MK8  Yoshi's Island"),
-    Course(1, 114, "MK8  Thwomp Ruins"),
-    Course(1, 143, "MK8  Bowser's Castle"),
-    Course(1, 213, "DS   Cheep Cheep Beach"),
-    Course(1, 254, "MK8  Hyrule Circuit"),
-    Course(1, 312, "3DS  Toad Circuit"),
-    Course(1, 243, "Wii  Grumble Volcano"),
-    Course(1, 153, "MK8  Dragon Driftway"),
-    Course(1, 454, "MK8  Piranha Plant Cove"),
-    Course(1, 144, "MK8  Rainbow Road"),
-
-    Course(1, 242, "3DS  Piranha Plant Slide"),
-    Course(1, 224, "3DS  DK Jungle"),
-    Course(1, 132, "MK8  Dolphin Shoals"),
-    Course(1, 423, "GCN  Waluigi Stadium"),
-    Course(1, 112, "MK8  Water Park"),
-    Course(1, 223, "N64  Royal Raceway"),
-    Course(1, 421, "Tour Bangkok Rush"),
-    Course(1, 123, "MK8  Twisted Mansion"),
-    Course(1, 342, "GBA  Snow Land"),
-    Course(1, 262, "GBA  Ribbon Road"),
-    Course(1, 152, "MK8  Excitebike Arena"),
-    Course(1, 461, "Tour Madrid Drive"),
-    Course(1, 424, "Tour Singapore Speedway"),
-    Course(1, 133, "MK8  Electrodrome"),
-    Course(1, 164, "MK8  Animal Crossing Circuit"),
-    Course(1, 363, "Tour Merry Mountain"),
-
-    Course(1, 113, "MK8  Sweet Sweet Canyon"),
-    Course(1, 331, "Tour New York Minute"),
-    Course(1, 111, "MK8  Mario Kart Stadium"),
-    Course(1, 442, "GBA  Sunset Wilds"),
-    Course(1, 444, "Tour Vancouver Velocity"),
-    Course(1, 451, "Tour Rome Avanti"),
-    Course(1, 124, "MK8  Shy Guy Falls"),
-    Course(1, 121, "MK8  Mario Circuit"),
-    Course(1, 212, "GBA  Mario Circuit"),
-    Course(1, 361, "Tour Berlin Byways"),
-    Course(1, 412, "GBA  Riverside Park"),
-    Course(1, 252, "SNES Rainbow Road"),
-    Course(1, 332, "SNES Mario Circuit 3"),
-    Course(1, 221, "GCN  Dry Dry Desert"),
-    Course(1, 422, "DS   Mario Circuit"),
-    Course(1, 311, "Tour Paris Promenade"),
-
-    Course(1, 431, "Tour Athens Dash"),
-    Course(1, 313, "N64  Choco Mountain"),
-    Course(1, 222, "SNES Donut Plains 3"),
-    Course(1, 441, "Tour Los Angeles Laps"),
-    Course(1, 411, "Tour Amsterdam Drift"),
-    Course(1, 231, "DS   Wario Stadium"),
-    Course(1, 161, "GCN  Baby Park"),
-    Course(1, 142, "MK8  Bone Dry Ruins"),
-    Course(1, 351, "Tour London Loop"),
-    Course(1, 261, "3DS  Neo Bowser City"),
-    Course(1, 151, "GCN  Yoshi's Circuit"),
-    Course(1, 341, "Tour Sydney Sprint"),
-    Course(1, 321, "Tour Tokyo Blur"),
-    Course(1, 162, "GBA  Cheese Land"),
-    Course(1, 463, "SNES Bowser's Castle 3"),
-    Course(1, 352, "GBA  Boo Lake"),
+    Course(2, 354, "Wii  Maple Treeway"),
+    Course(3, 434, "MK8  Squeaky Clean Sprint"),
+    Course(4, 241, "DS   Tick Tock Clock"),
+    Course(5, 211, "Wii  Moo Moo Meadows"),
+    Course(6, 362, "DS   Peach Gardens"),
+    Course(7, 433, "Wii  Moonview Highway"),
+    Course(8, 413, "Wii  DK Summit"),
+    Course(9, 253, "MK8  Ice Ice Outpost"),
+    Course(10, 353, "3DS  Rock Rock Mountain"),
+    Course(11, 344, "MK8  Sky-High Sundae"),
+    Course(12, 131, "MK8  Sunshine Airport"),
+    Course(13, 232, "GCN  Sherbet Land"),
+    Course(14, 334, "DS   Waluigi Pinball"),
+    Course(15, 233, "3DS  Music Park"),
+    Course(16, 464, "Wii  Rainbow Road"),
+    Course(17, 443, "Wii  Koopa Cape"),
+    Course(18, 244, "N64  Rainbow Road"),
+    Course(19, 234, "N64  Yoshi Valley"),
+    Course(20, 343, "Wii  Mushroom Gorge"),
+    Course(21, 214, "N64  Toad's Turnpike"),
+    Course(22, 134, "MK8  Mount Wario"),
+    Course(23, 141, "MK8  Cloudtop Cruise"),
+    Course(24, 322, "DS   Shroom Ridge"),
+    Course(25, 432, "GCN  Daisy Cruiser"),
+    Course(26, 324, "Tour Ninja Hideaway"),
+    Course(27, 364, "3DS  Rainbow Road"),
+    Course(28, 251, "Wii  Wario's Gold Mine"),
+    Course(29, 163, "MK8  Wild Woods"),
+    Course(30, 333, "N64  Kalimari Desert"),
+    Course(31, 453, "Wii  Daisy Circuit"),
+    Course(32, 323, "GBA  Sky Garden"),
+    Course(33, 462, "3DS  Rosalina's Ice World"),
+    Course(34, 122, "MK8  Toad Harbor"),
+    Course(35, 264, "MK8  Big Blue"),
+    Course(36, 154, "MK8  Mute City"),
+    Course(37, 452, "GCN  DK Mountain"),
+    Course(38, 263, "MK8  Super Bell Subway"),
+    Course(39, 414, "MK8  Yoshi's Island"),
+    Course(40, 114, "MK8  Thwomp Ruins"),
+    Course(41, 143, "MK8  Bowser's Castle"),
+    Course(42, 213, "DS   Cheep Cheep Beach"),
+    Course(43, 254, "MK8  Hyrule Circuit"),
+    Course(44, 312, "3DS  Toad Circuit"),
+    Course(45, 243, "Wii  Grumble Volcano"),
+    Course(46, 153, "MK8  Dragon Driftway"),
+    Course(47, 454, "MK8  Piranha Plant Cove"),
+    Course(48, 144, "MK8  Rainbow Road"),
+    Course(49, 242, "3DS  Piranha Plant Slide"),
+    Course(50, 224, "3DS  DK Jungle"),
+    Course(51, 132, "MK8  Dolphin Shoals"),
+    Course(52, 423, "GCN  Waluigi Stadium"),
+    Course(53, 112, "MK8  Water Park"),
+    Course(54, 223, "N64  Royal Raceway"),
+    Course(55, 421, "Tour Bangkok Rush"),
+    Course(56, 123, "MK8  Twisted Mansion"),
+    Course(57, 342, "GBA  Snow Land"),
+    Course(58, 262, "GBA  Ribbon Road"),
+    Course(59, 152, "MK8  Excitebike Arena"),
+    Course(60, 461, "Tour Madrid Drive"),
+    Course(61, 424, "Tour Singapore Speedway"),
+    Course(62, 133, "MK8  Electrodrome"),
+    Course(63, 164, "MK8  Animal Crossing Circuit"),
+    Course(64, 363, "Tour Merry Mountain"),
+    Course(65, 113, "MK8  Sweet Sweet Canyon"),
+    Course(66, 331, "Tour New York Minute"),
+    Course(67, 111, "MK8  Mario Kart Stadium"),
+    Course(68, 442, "GBA  Sunset Wilds"),
+    Course(69, 444, "Tour Vancouver Velocity"),
+    Course(70, 451, "Tour Rome Avanti"),
+    Course(71, 124, "MK8  Shy Guy Falls"),
+    Course(72, 121, "MK8  Mario Circuit"),
+    Course(73, 212, "GBA  Mario Circuit"),
+    Course(74, 361, "Tour Berlin Byways"),
+    Course(75, 412, "GBA  Riverside Park"),
+    Course(76, 252, "SNES Rainbow Road"),
+    Course(77, 332, "SNES Mario Circuit 3"),
+    Course(78, 221, "GCN  Dry Dry Desert"),
+    Course(79, 422, "DS   Mario Circuit"),
+    Course(80, 311, "Tour Paris Promenade"),
+    Course(81, 431, "Tour Athens Dash"),
+    Course(82, 313, "N64  Choco Mountain"),
+    Course(83, 222, "SNES Donut Plains 3"),
+    Course(84, 441, "Tour Los Angeles Laps"),
+    Course(85, 411, "Tour Amsterdam Drift"),
+    Course(86, 231, "DS   Wario Stadium"),
+    Course(87, 161, "GCN  Baby Park"),
+    Course(88, 142, "MK8  Bone Dry Ruins"),
+    Course(89, 351, "Tour London Loop"),
+    Course(90, 261, "3DS  Neo Bowser City"),
+    Course(91, 151, "GCN  Yoshi's Circuit"),
+    Course(92, 341, "Tour Sydney Sprint"),
+    Course(93, 321, "Tour Tokyo Blur"),
+    Course(94, 162, "GBA  Cheese Land"),
+    Course(95, 463, "SNES Bowser's Castle 3"),
+    Course(96, 352, "GBA  Boo Lake"),
 ])
 
 
@@ -293,8 +290,8 @@ To avoid accidental generation, any input besides these commands will do nothing
 Enter to generate a new course. (Blank input)
 
 Information:
-  remaining/re: Print a list of remaining courses.
-       used/ls: Print a list of used courses.
+  remaining/re/ls: Print a list of remaining courses.
+             used: Print a list of used courses.
 
 List editing:
          reset: Reset the course list.
@@ -328,7 +325,7 @@ except:
 print("Enter 'help' for commands.")
 while True:
     user_input = input(":> ").lower()
-    used_course_list = active_course_list ^ full_course_list
+    used_course_list = full_course_list - active_course_list
 
 
     try:
@@ -341,12 +338,12 @@ while True:
                 print(help_block)
 
 
-            case "remaining" | "re":
+            case "remaining" | "re" | "ls":
                 active_course_list.print_list()
                 print(f"There are {len(active_course_list.course_list)} courses in the list.")
 
 
-            case "used" | "ls":
+            case "used":
                 used_course_list.print_list()
                 print(f"{len(used_course_list.course_list)} courses have been used.")
 
@@ -417,10 +414,10 @@ while True:
     except EmptyListError:
         if active_course_list.is_tiered:
             confirm_save_tiered_changes = input("The tiered list is empty. Resuming normal generation. Remove tiered courses from the main list? 'n' to deny: ").lower()
-            if confirm_save_tiered_changes == "n":
+            if confirm_save_tiered_changes in ["n", "no"]:
                 active_course_list = CourseList(active_course_list.untiered_course_list)
             else:
-                active_course_list = CourseList(active_course_list.untiered_course_list) ^ CourseList(active_course_list.tiered_list)
+                active_course_list = CourseList(active_course_list.untiered_course_list) - CourseList(active_course_list.tiered_list)
 
             active_course_list.overwrite_persistent_list()
 
