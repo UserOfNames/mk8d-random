@@ -19,30 +19,26 @@ class Course():
         self.name = name
 
     def __str__(self):
-        return f"({self.coord}) {self.name}"
+        return f"({self.coord}) {self.name} ({self.rank})"
 
 
 class CourseList():
     def __init__(self, course_list=[]):
-        self.course_list = course_list
+        # course_list will change over time, static_list is a permanent backup
+        self.course_list = self.static_list = course_list
+        # old_list is a checkpoint that updates after each change for undoing
         self.old_list = course_list.copy()
         self.is_tiered = False
 
+        # Does nothing for untiered lists but the LSP whines if these aren't here
         self.untiered_course_list = course_list
         self.tiered_list = []
 
 
     def __sub__(self, other):
-        symdiff = []
-        symdiff_ranks = set(course.rank for course in self.course_list) ^ set(course.rank for course in other.course_list)
-
-        for course in self.course_list:
-            if course.rank in symdiff_ranks:
-                symdiff.append(course)
-
-        symdiff.sort(key=lambda x: x.rank)
-
-        return CourseList(symdiff)
+        diff_list = list(set(self.course_list) - set(other.course_list))
+        diff_list.sort(key = lambda x: x.rank)
+        return CourseList(diff_list)
 
 
     def overwrite_persistent_list(self):
@@ -137,12 +133,12 @@ class CourseList():
 
 
     def generate_course(self):
-        if len(self.course_list) == 0:
-            raise EmptyListError
-
         course = self.course_list[random.randrange(len(self.course_list))]
         print(course)
         self.remove_course(course)
+
+        if len(self.course_list) == 0:
+            raise EmptyListError
 
 
 class TieredList(CourseList):
@@ -315,11 +311,23 @@ list_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'list.pkl'
 
 try:
     with open(list_file, 'rb') as rfile:
-        active_course_list = CourseList(pickle.load(rfile))
+        # This ensures course objects in the active list are the same as in the full list, makes some methods cleaner
+        saved_list = pickle.load(rfile)
+
+
+    saved_ranks = [course.rank for course in saved_list]
+
+    saved_list_cleaned = [course for course in full_course_list.course_list if course.rank in saved_ranks]
+    
+    saved_list_cleaned.sort(key = lambda x: x.rank)
+
+    active_course_list = CourseList(saved_list_cleaned)
+
+
 except:
     with open(list_file, 'wb') as wfile:
         pickle.dump(full_course_list.course_list, wfile, pickle.HIGHEST_PROTOCOL)
-    active_course_list = CourseList(full_course_list.course_list)
+    active_course_list = full_course_list
 
 
 print("Enter 'help' for commands.")
@@ -330,7 +338,7 @@ while True:
 
     try:
         match user_input:
-            case 'q' | 'quit' | 'exit':
+            case "q" | "quit" | "exit":
                 break
 
 
@@ -414,13 +422,12 @@ while True:
     except EmptyListError:
         if active_course_list.is_tiered:
             confirm_save_tiered_changes = input("The tiered list is empty. Resuming normal generation. Remove tiered courses from the main list? 'n' to deny: ").lower()
+
             if confirm_save_tiered_changes in ["n", "no"]:
                 active_course_list = CourseList(active_course_list.untiered_course_list)
             else:
                 active_course_list = CourseList(active_course_list.untiered_course_list) - CourseList(active_course_list.tiered_list)
-
-            active_course_list.overwrite_persistent_list()
-
+                active_course_list.overwrite_persistent_list()
 
         else:
             print("The course list is empty. Resetting.")
