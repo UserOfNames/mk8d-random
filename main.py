@@ -133,23 +133,29 @@ class CourseList():
 
 
     def generate_course(self):
+        if len(self.course_list) == 0:
+            raise EmptyListError
+
         course = self.course_list[random.randrange(len(self.course_list))]
         print(course)
         self.remove_course(course)
 
-        if len(self.course_list) == 0:
-            raise EmptyListError
-
 
 class TieredList(CourseList):
     def __init__(self, prix_size, course_list = []):
-        self.untiered_course_list = course_list
-        self.prix_size = prix_size
-        self.is_tiered = True
+        self.untiered_course_list = course_list.copy()
         self.course_list = course_list
+        self.is_tiered = True
 
-        if len(self.course_list) == 0:
-            raise EmptyListError
+
+        if len(self.course_list) < prix_size:
+            raise SizeError("Error: Not enough courses")
+
+
+        if len(self.course_list) % prix_size != 0:
+            if input("Cannot evenly divide the course list. Continuing will stagger the tiers. Proceed? ('y' to confirm): ").lower() in ["y", "yes"]:
+                self.make_divisible(prix_size)
+
 
         chunked_list = self.chunk_list(prix_size)
         self.tiered_list = []
@@ -163,16 +169,22 @@ class TieredList(CourseList):
 
     def chunk_list(self, size):
         chunked = []
-        length = len(self.untiered_course_list)
+        length = len(self.course_list)
         chunk_size = length // size
 
         if chunk_size != length / size:
             raise SizeError("Error: Cannot evenly divide the course list by that number.")
 
         for i in range(0, length, chunk_size):
-            chunked.append(self.untiered_course_list[i:i+chunk_size])
+            chunked.append(self.course_list[i:i+chunk_size])
 
         return chunked
+
+
+    def make_divisible(self, size):
+        while len(self.course_list) % size != 0:
+            index = random.randrange(len(self.course_list))
+            self.course_list.pop(index)
 
 
 def reset_active_list():
@@ -421,13 +433,9 @@ while True:
 
     except EmptyListError:
         if active_course_list.is_tiered:
-            confirm_save_tiered_changes = input("The tiered list is empty. Resuming normal generation. Remove tiered courses from the main list? 'n' to deny: ").lower()
-
-            if confirm_save_tiered_changes in ["n", "no"]:
-                active_course_list = CourseList(active_course_list.untiered_course_list)
-            else:
-                active_course_list = CourseList(active_course_list.untiered_course_list) - CourseList(active_course_list.tiered_list)
-                active_course_list.overwrite_persistent_list()
+            print("The tiered list is empty. Resuming normal generation.")
+            active_course_list = CourseList(active_course_list.untiered_course_list) - CourseList(active_course_list.tiered_list)
+            active_course_list.overwrite_persistent_list()
 
         else:
             print("The course list is empty. Resetting.")
