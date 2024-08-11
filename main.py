@@ -25,13 +25,13 @@ class Course():
 class CourseList():
     def __init__(self, course_list=[]):
         # course_list will change over time, static_list is a permanent backup
-        self.course_list = self.static_list = course_list
+        self.course_list = course_list
+        self.static_list = course_list.copy()
         # old_list is a checkpoint that updates after each change for undoing
         self.old_list = course_list.copy()
         self.is_tiered = False
 
-        # Does nothing for untiered lists but the LSP whines if these aren't here
-        self.untiered_course_list = course_list
+        # shut up diagnostics
         self.tiered_list = []
 
 
@@ -143,8 +143,8 @@ class CourseList():
 
 class TieredList(CourseList):
     def __init__(self, prix_size, course_list = []):
-        self.untiered_course_list = course_list.copy()
         self.course_list = course_list
+        self.static_list = course_list.copy()
         self.is_tiered = True
 
 
@@ -409,7 +409,7 @@ while True:
                     exit_tiered = input("Already using a tiered list. Resume normal generation? 'y' to confirm (this will prevent the course list from updating!): ").lower()
                     if exit_tiered == "y":
                         print("Resuming normal generation.")
-                        active_course_list = CourseList(active_course_list.untiered_course_list)
+                        active_course_list = CourseList(active_course_list.static_list)
                         continue
                     else:
                         print("Continuing tiered generation.")
@@ -434,7 +434,7 @@ while True:
     except EmptyListError:
         if active_course_list.is_tiered:
             print("The tiered list is empty. Resuming normal generation.")
-            active_course_list = CourseList(active_course_list.untiered_course_list) - CourseList(active_course_list.tiered_list)
+            active_course_list = CourseList(active_course_list.static_list) - CourseList(active_course_list.tiered_list)
             active_course_list.overwrite_persistent_list()
 
         else:
