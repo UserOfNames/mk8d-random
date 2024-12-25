@@ -1,6 +1,6 @@
 import random, os, pickle, importlib
 from collections import deque
-from src.CourseClass import Course
+from .CourseClass import Course
 
 class CourseList():
     def __init__(self, list_name):

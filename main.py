@@ -1,10 +1,7 @@
-from textual.events import Mount
 from src import CourseListClass as cl
-from src import ScanLists as sl
 
 from textual.app import App, ComposeResult
-from textual.widgets import Header, Footer, Button, Label
-from textual.containers import VerticalScroll
+from textual.widgets import Header, Footer
 
 c = cl.CourseList("mk8d")
 
@@ -18,8 +15,15 @@ class Main(App):
         yield Footer()
 
     def action_scan_lists(self) -> None:
-        Label("hello").mount()
+        pass
 
 
-app = Main()
-app.run()
+# app = Main()
+# app.run()
+
+
+# Initial screen: List of CL
+# Scan for CL: Popup or screen of new lists, checkable
+
+# Select a CL: List of remaining courses, checkable?
+    # Back: Go back to list of CL
