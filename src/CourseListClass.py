@@ -6,9 +6,9 @@ class CourseList():
     def __init__(self, list_name):
         base_dir  = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
         lists_dir = os.path.join(base_dir, "lists")
-        saves_dir = os.path.join(base_dir, "lists", "saves")
+        saves_dir = os.path.join(base_dir, "saves")
 
-        list_file = importlib.import_module(os.path.join(lists_dir, f"{list_name}.py"))
+        list_file = importlib.import_module(f"lists.{list_name}")
 
         self.save_file   = os.path.join(saves_dir, f"{list_name}.pkl")
         self.course_list = list_file.course_list
@@ -23,11 +23,14 @@ class CourseList():
         return CourseList(res)
 
 
-    def overwrite_save_file(self):
-        with open(self.save_file, 'wb') as wfile:
+    def overwrite_save_file(self) -> None:
+        with open(self.save_file, "wb") as wfile:
             pickle.dump(self, wfile, pickle.HIGHEST_PROTOCOL)
 
 
-    def print_list(self):
+    def print_list(self) -> None:
         for course in sorted(self.course_list, key=lambda x: x.coord):
             print(course)
+
+
+    # TODO: Finish implementing CourseList

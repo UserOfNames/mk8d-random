@@ -1,6 +1,4 @@
-from CourseClass import Course
-
-name = "mk8d"
+from src.CourseClass import Course
 
 course_list = [
     Course(1, 314, "Wii  Coconut Mall"),
