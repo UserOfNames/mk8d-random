@@ -18,8 +18,8 @@ class Main(App):
         pass
 
 
-# app = Main()
-# app.run()
+app = Main()
+app.run()
 
 
 # Initial screen: List of CL
