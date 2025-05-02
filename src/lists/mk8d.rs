@@ -1,4 +1,4 @@
-use crate::Course;
+use crate::courses::Course;
 
 pub fn make_mk8d() -> Vec<Course> {
     vec![
