@@ -2,7 +2,7 @@ mod lists;
 use lists::mk8d::make_mk8d;
 
 mod courses;
-use courses::CourseList;
+use courses::course_list::CourseList;
 
 fn main() {
     run();

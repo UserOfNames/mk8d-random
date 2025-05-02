@@ -1,63 +1,16 @@
+use super::course::Course;
+use super::history::Action;
+use super::history::History;
 use rand::{self, Rng};
-use serde::{Deserialize, Serialize};
 use std::fmt::{self, Display, Formatter};
 use std::fs::{self, File, create_dir_all};
 use std::io::{self, Write};
 use std::path::PathBuf;
 
-#[derive(Serialize, Deserialize, Debug, Clone)]
-pub struct Course {
-    name: String,
-    coord: u32,
-    rank: u8,
-}
-
-impl Course {
-    pub fn new(rank: u8, coord: u32, name: &str) -> Self {
-        Course {
-            name: name.to_string(),
-            coord,
-            rank,
-        }
-    }
-}
-
-impl Display for Course {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {:02}) {}", self.coord, self.rank, self.name)
-    }
-}
-
-impl PartialEq for Course {
-    fn eq(&self, other: &Self) -> bool {
-        self.rank == other.rank
-    }
-}
-
-impl Eq for Course {}
-
-impl PartialOrd for Course {
-    fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.rank.partial_cmp(&other.rank)
-    }
-}
-
-impl Ord for Course {
-    fn cmp(&self, other: &Self) -> std::cmp::Ordering {
-        self.rank.cmp(&other.rank)
-    }
-}
-
-// An action the user takes, e.g. adding or removing a course
-enum Action {
-    Add(Course),
-    Remove(Course),
-}
-
 pub struct CourseList {
     pub list: Vec<Course>,
     file: PathBuf,
-    history: Vec<Action>,
+    history: History,
 }
 
 impl CourseList {
@@ -68,7 +21,7 @@ impl CourseList {
         CourseList {
             list: Vec::new(),
             file: path.into(),
-            history: Vec::new(),
+            history: History::new(),
         }
     }
 
@@ -91,20 +44,43 @@ impl CourseList {
     }
 
     pub fn push(&mut self, course: Course) {
-        self.insert_in_order(course);
+        match self._push(course.clone()) {
+            Ok(_) => self.history.push(Action::Add(course)),
+            Err(_) => eprintln!(
+                "ERROR: While adding course: Duplicate course entry {}",
+                course
+            ),
+        }
+    }
+
+    fn _push(&mut self, course: Course) -> Result<(), ()> {
+        match self.list.binary_search(&course) {
+            Ok(_) => Err(()),
+            Err(index) => {
+                self.list.insert(index, course);
+                Ok(())
+            }
+        }
     }
 
     pub fn remove(&mut self, course: Course) {
-        match self.list.binary_search(&course) {
-            Ok(index) => {
-                self.list.remove(index);
-            }
-
+        match self._remove(course.clone()) {
+            Ok(_) => self.history.push(Action::Remove(course)),
             Err(_) => eprintln!(
                 "ERROR While removing course: Course {} not found in list",
                 course
             ),
-        };
+        }
+    }
+
+    fn _remove(&mut self, course: Course) -> Result<(), ()> {
+        match self.list.binary_search(&course) {
+            Ok(index) => {
+                self.list.remove(index);
+                Ok(())
+            }
+            Err(_) => Err(()),
+        }
     }
 
     fn search_list(&self, searched: &str) -> Vec<Course> {
@@ -126,18 +102,48 @@ impl CourseList {
 
         let to_pop: usize = rand::rng().random_range(0..self.list.len());
         println!("{}", self.list[to_pop]);
+        self.history.push(Action::Remove(self.list[to_pop].clone()));
         self.list.remove(to_pop);
         Some(())
     }
 
-    fn insert_in_order(&mut self, course: Course) {
-        match self.list.binary_search(&course) {
-            Ok(_) => eprintln!(
-                "ERROR: While adding course: Duplicate course entry {}",
-                course
-            ),
+    pub fn get_history(&self) -> String {
+        format!("{}", self.history)
+    }
 
-            Err(index) => self.list.insert(index, course),
+    pub fn roll_back(&mut self) {
+        let res = self.history.back();
+        self.undo_action(match res {
+            Some(a) => a,
+            None => {
+                eprintln!("ERROR While rolling history back: ");
+                return;
+            }
+        });
+    }
+
+    pub fn roll_forward(&mut self) {
+        let res = self.history.forward();
+        self.apply_action(match res {
+            Some(a) => a,
+            None => {
+                eprintln!("ERROR While rolling history forward: ");
+                return;
+            }
+        });
+    }
+
+    fn apply_action(&mut self, action: Action) {
+        let _ = match action {
+            Action::Add(c) => self._remove(c),
+            Action::Remove(c) => self._push(c),
+        };
+    }
+
+    fn undo_action(&mut self, action: Action) {
+        let _ = match action {
+            Action::Add(c) => self._remove(c),
+            Action::Remove(c) => self._push(c),
         };
     }
 }
@@ -149,78 +155,46 @@ impl Display for CourseList {
     }
 }
 
+
+
 #[cfg(test)]
 mod tests {
     use super::*;
-    use std::fs;
     use tempfile::tempdir;
 
     #[test]
-    fn test_course_new() {
-        let course = Course::new(1, 111, "Test1");
-        assert_eq!(course.rank, 1);
-        assert_eq!(course.coord, 111);
-        assert_eq!(course.name, "Test1");
-    }
-
-    #[test]
-    fn test_course_display() {
-        let course = Course::new(2, 112, "Test2");
-        assert_eq!(format!("{}", course), "(112, 02) Test2");
-    }
-
-    #[test]
-    fn test_course_partial_eq() {
-        let course = Course::new(3, 113, "Test3a");
-        let course_eq = Course::new(3, 999, "whatever");
-        let course_not_eq = Course::new(4, 113, "Test3b");
-        assert_eq!(course, course_eq);
-        assert_ne!(course, course_not_eq);
-    }
-
-    #[test]
-    fn test_course_ordering() {
-        let course1 = Course::new(3, 113, "Test4a");
-        let course2 = Course::new(4, 999, "Test4b");
-        assert!(course1 < course2);
-        assert!(course2 > course1);
-        assert!(!(course1 > course2));
-        assert!(!(course2 < course1));
-    }
-
-    #[test]
-    fn test_courselist_new() {
+    fn test_new() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let course_list = CourseList::new(&file_path);
         assert!(course_list.list.is_empty());
         assert_eq!(course_list.file, file_path);
-        assert!(course_list.history.is_empty());
+        assert!(!course_list.history.has_history());
     }
 
     #[test]
-    fn test_courselist_insert_in_order() {
+    fn test_insert_in_order() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
         let course1 = Course::new(1, 111, "One");
         let course2 = Course::new(2, 112, "Two");
         let course3 = Course::new(3, 113, "Three");
 
-        course_list.insert_in_order(course1.clone());
+        course_list._push(course1.clone()).unwrap();
         assert_eq!(course_list.list.len(), 1);
         assert_eq!(course_list.list[0], course1);
 
-        course_list.insert_in_order(course3.clone());
+        course_list._push(course3.clone()).unwrap();
         assert_eq!(course_list.list.len(), 2);
         assert_eq!(course_list.list[0], course1);
         assert_eq!(course_list.list[1], course3);
 
-        course_list.insert_in_order(course2.clone());
+        course_list._push(course2.clone()).unwrap();
         assert_eq!(course_list.list.len(), 3);
         assert_eq!(course_list.list[0], course1);
         assert_eq!(course_list.list[1], course2);
         assert_eq!(course_list.list[2], course3);
 
-        course_list.insert_in_order(course2.clone());
+        assert!(course_list._push(course2.clone()).is_err());
         assert_eq!(course_list.list.len(), 3);
         assert_eq!(course_list.list[0], course1);
         assert_eq!(course_list.list[1], course2);
@@ -228,7 +202,7 @@ mod tests {
     }
 
     #[test]
-    fn test_courselist_push() {
+    fn test_push() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
         let course1 = Course::new(1, 111, "One");
@@ -241,7 +215,7 @@ mod tests {
     }
 
     #[test]
-    fn test_courselist_remove() {
+    fn test_remove() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
         let course1 = Course::new(1, 111, "One");
@@ -261,7 +235,7 @@ mod tests {
     }
 
     #[test]
-    fn test_courselist_dump_and_restore() {
+    fn test_dump_and_restore() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
         course_list.push(Course::new(1, 111, "One"));
@@ -280,7 +254,7 @@ mod tests {
     }
 
     #[test]
-    fn test_courselist_search_list() {
+    fn test_search_list() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
         course_list.push(Course::new(1, 101, "One"));
@@ -297,7 +271,7 @@ mod tests {
     }
 
     #[test]
-    fn test_courselist_generate() {
+    fn test_generate() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
         course_list.push(Course::new(1, 101, "One"));
@@ -311,11 +285,30 @@ mod tests {
     }
 
     #[test]
-    fn test_courselist_display_list() {
+    fn test_display_list() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
         course_list.push(Course::new(1, 101, "One"));
         course_list.push(Course::new(2, 102, "Two"));
         assert_eq!(format!("{}", course_list), "(101, 01) One\n(102, 02) Two");
+    }
+
+    #[test]
+    fn test_roll_forward_and_back() {
+        let file_path = tempdir().unwrap().path().join("test.json");
+        let mut course_list = CourseList::new(&file_path);
+
+        let course1 = Course::new(1, 101, "One");
+        let course2 = Course::new(2, 102, "Two");
+
+        course_list.push(course1.clone());
+        course_list.push(course2.clone());
+
+        course_list.roll_back();
+        assert_eq!(course_list.list.len(), 1);
+        assert_eq!(course_list.list[0], course1);
+
+        course_list.roll_back();
+        assert_eq!(course_list.list.len(), 0);
     }
 }
