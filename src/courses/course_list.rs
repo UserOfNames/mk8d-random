@@ -14,10 +14,7 @@ pub struct CourseList {
 }
 
 impl CourseList {
-    pub fn new<P>(path: P) -> CourseList
-    where
-        P: Into<PathBuf>,
-    {
+    pub fn new(path: impl Into<PathBuf>) -> CourseList {
         CourseList {
             list: Vec::new(),
             file: path.into(),
@@ -43,14 +40,10 @@ impl CourseList {
         Ok(())
     }
 
-    pub fn push(&mut self, course: Course) {
-        match self._push(course.clone()) {
-            Ok(_) => self.history.push(Action::Add(course)),
-            Err(_) => eprintln!(
-                "ERROR: While adding course: Duplicate course entry {}",
-                course
-            ),
-        }
+    pub fn push(&mut self, course: Course) -> Result<(), ()> {
+        self._push(course.clone())?;
+        self.history.push(Action::Add(course));
+        Ok(())
     }
 
     fn _push(&mut self, course: Course) -> Result<(), ()> {
@@ -63,14 +56,10 @@ impl CourseList {
         }
     }
 
-    pub fn remove(&mut self, course: Course) {
-        match self._remove(course.clone()) {
-            Ok(_) => self.history.push(Action::Remove(course)),
-            Err(_) => eprintln!(
-                "ERROR While removing course: Course {} not found in list",
-                course
-            ),
-        }
+    pub fn remove(&mut self, course: Course) -> Result<(), ()> {
+        self._remove(course.clone())?;
+        self.history.push(Action::Remove(course));
+        Ok(())
     }
 
     fn _remove(&mut self, course: Course) -> Result<(), ()> {
@@ -107,30 +96,30 @@ impl CourseList {
         Some(())
     }
 
-    pub fn get_history(&self) -> String {
-        format!("{}", self.history)
+    pub fn get_history(&self) -> &History {
+        &self.history
     }
 
-    pub fn roll_back(&mut self) {
-        let res = self.history.back();
-        self.undo_action(match res {
-            Some(a) => a,
-            None => {
-                eprintln!("ERROR While rolling history back: ");
-                return;
-            }
-        });
+    pub fn roll_back(&mut self) -> Result<(), ()> {
+        match self.history.back() {
+            Some(action) => {
+                self.undo_action(action);
+                Ok(())
+            },
+
+            None => Err(()),
+        }
     }
 
-    pub fn roll_forward(&mut self) {
-        let res = self.history.forward();
-        self.apply_action(match res {
-            Some(a) => a,
-            None => {
-                eprintln!("ERROR While rolling history forward: ");
-                return;
-            }
-        });
+    pub fn roll_forward(&mut self) -> Result<(), ()> {
+        match self.history.back() {
+            Some(action) => {
+                self.apply_action(action);
+                Ok(())
+            },
+
+            None => Err(()),
+        }
     }
 
     fn apply_action(&mut self, action: Action) {
@@ -207,8 +196,8 @@ mod tests {
         let mut course_list = CourseList::new(&file_path);
         let course1 = Course::new(1, 111, "One");
         let course2 = Course::new(2, 112, "Two");
-        course_list.push(course1.clone());
-        course_list.push(course2.clone());
+        course_list.push(course1.clone()).unwrap();
+        course_list.push(course2.clone()).unwrap();
         assert_eq!(course_list.list.len(), 2);
         assert_eq!(course_list.list[0], course1);
         assert_eq!(course_list.list[1], course2);
@@ -220,17 +209,17 @@ mod tests {
         let mut course_list = CourseList::new(&file_path);
         let course1 = Course::new(1, 111, "One");
         let course2 = Course::new(2, 112, "Two");
-        course_list.push(course1.clone());
-        course_list.push(course2.clone());
-        course_list.remove(course1.clone());
+        course_list.push(course1.clone()).unwrap();
+        course_list.push(course2.clone()).unwrap();
+        course_list.remove(course1.clone()).unwrap();
         assert_eq!(course_list.list.len(), 1);
         assert_eq!(course_list.list[0], course2);
-        course_list.remove(course1.clone());
+        assert!(course_list.remove(course1.clone()).is_err());
         assert_eq!(course_list.list.len(), 1);
         assert_eq!(course_list.list[0], course2);
-        course_list.remove(course2.clone());
+        course_list.remove(course2.clone()).unwrap();
         assert_eq!(course_list.list.len(), 0);
-        course_list.remove(course2.clone());
+        assert!(course_list.remove(course2.clone()).is_err());
         assert_eq!(course_list.list.len(), 0);
     }
 
@@ -238,8 +227,8 @@ mod tests {
     fn test_dump_and_restore() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
-        course_list.push(Course::new(1, 111, "One"));
-        course_list.push(Course::new(2, 112, "Two"));
+        course_list.push(Course::new(1, 111, "One")).unwrap();
+        course_list.push(Course::new(2, 112, "Two")).unwrap();
 
         course_list.dump_list().expect("Failed to dump list");
 
@@ -257,9 +246,9 @@ mod tests {
     fn test_search_list() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
-        course_list.push(Course::new(1, 101, "One"));
-        course_list.push(Course::new(2, 102, "Two"));
-        course_list.push(Course::new(3, 103, "Three"));
+        course_list.push(Course::new(1, 101, "One")).unwrap();
+        course_list.push(Course::new(2, 102, "Two")).unwrap();
+        course_list.push(Course::new(3, 103, "Three")).unwrap();
 
         let results = course_list.search_list("t");
         assert_eq!(results.len(), 2);
@@ -274,8 +263,8 @@ mod tests {
     fn test_generate() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
-        course_list.push(Course::new(1, 101, "One"));
-        course_list.push(Course::new(2, 102, "Two"));
+        course_list.push(Course::new(1, 101, "One")).unwrap();
+        course_list.push(Course::new(2, 102, "Two")).unwrap();
 
         assert!(course_list.generate().is_some());
         assert_eq!(course_list.list.len(), 1);
@@ -288,8 +277,8 @@ mod tests {
     fn test_display_list() {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
-        course_list.push(Course::new(1, 101, "One"));
-        course_list.push(Course::new(2, 102, "Two"));
+        course_list.push(Course::new(1, 101, "One")).unwrap();
+        course_list.push(Course::new(2, 102, "Two")).unwrap();
         assert_eq!(format!("{}", course_list), "(101, 01) One\n(102, 02) Two");
     }
 
@@ -301,14 +290,35 @@ mod tests {
         let course1 = Course::new(1, 101, "One");
         let course2 = Course::new(2, 102, "Two");
 
-        course_list.push(course1.clone());
-        course_list.push(course2.clone());
+        course_list.push(course1.clone()).unwrap();
+        course_list.push(course2.clone()).unwrap();
 
-        course_list.roll_back();
+        course_list.roll_back().unwrap();
         assert_eq!(course_list.list.len(), 1);
         assert_eq!(course_list.list[0], course1);
 
-        course_list.roll_back();
+        course_list.roll_back().unwrap();
         assert_eq!(course_list.list.len(), 0);
+    }
+
+    #[test]
+    fn test_get_history() {
+        let file_path = tempdir().unwrap().path().join("test.json");
+        let mut course_list = CourseList::new(&file_path);
+
+        let mut hist = course_list.get_history();
+        assert!(!hist.has_history());
+
+        let course1 = Course::new(1, 101, "One");
+        let course2 = Course::new(2, 102, "Two");
+        let course3 = Course::new(3, 103, "Three");
+
+        course_list.push(course1.clone()).unwrap();
+        course_list.push(course2.clone()).unwrap();
+        course_list.push(course3.clone()).unwrap();
+        course_list.remove(course2.clone()).unwrap();
+
+        hist = course_list.get_history();
+        assert!(hist.has_history());
     }
 }

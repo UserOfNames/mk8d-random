@@ -24,11 +24,6 @@ class Course():
 
 class CourseList():
     def __init__(self, course_list=[]):
-        # course_list will change over time, static_list is a permanent backup
-        self.course_list = course_list
-        self.static_list = course_list.copy()
-        # old_list is a checkpoint that updates after each change for undoing
-        self.old_list = course_list.copy()
         self.is_tiered = False
 
         # shut up diagnostics
@@ -39,53 +34,6 @@ class CourseList():
         diff_list = list(set(self.course_list) - set(other.course_list))
         diff_list.sort(key = lambda x: x.rank)
         return CourseList(diff_list)
-
-
-    def overwrite_persistent_list(self):
-        if self.is_tiered:
-            return
-
-        with open(list_file, 'wb') as wfile:
-            pickle.dump(self.course_list, wfile, pickle.HIGHEST_PROTOCOL)
-
-
-    def read_persistent_list(self):
-        with open(list_file, 'rb') as rfile:
-            self.course_list = pickle.load(rfile)
-
-
-    def print_list(self):
-        for course in sorted(self.course_list, key=lambda x: x.coord):
-            print(course)
-
-
-    def backup_list(self):
-        self.old_list = self.course_list.copy()
-
-
-    def search_list(self, key):
-        matches = {}
-        i = 1
-
-        for course in sorted(self.course_list, key=lambda x: x.coord):
-            if key in course.name.lower():
-                matches[i] = course
-                i += 1
-
-        return matches
-
-
-    def add_course(self, *args):
-        self.backup_list()
-        for course in args:
-            self.course_list.append(course)
-        self.course_list.sort(key=lambda x: x.rank)
-
-
-    def remove_course(self, *args):
-        self.backup_list()
-        for course in args:
-            self.course_list.remove(course)
 
 
     def search_and_add(self, used_courses):
@@ -124,21 +72,6 @@ class CourseList():
 
         index = int(key_selection)
         active_course_list.remove_course(matches[index])
-
-
-    def undo_last_action(self):
-        old_list_temp = self.old_list.copy()
-        self.backup_list()
-        self.course_list = old_list_temp
-
-
-    def generate_course(self):
-        if len(self.course_list) == 0:
-            raise EmptyListError
-
-        course = self.course_list[random.randrange(len(self.course_list))]
-        print(course)
-        self.remove_course(course)
 
 
 class TieredList(CourseList):
@@ -191,110 +124,6 @@ def reset_active_list():
     active_course_list.backup_list()
     active_course_list.course_list = full_course_list.course_list.copy()
 
-full_course_list = CourseList([
-    Course(1, 314, "Wii  Coconut Mall"),
-    Course(2, 354, "Wii  Maple Treeway"),
-    Course(3, 211, "Wii  Moo Moo Meadows"),
-    Course(4, 434, "MK8  Squeaky Clean Sprint"),
-    Course(5, 241, "DS   Tick Tock Clock"),
-    Course(6, 362, "DS   Peach Gardens"),
-    Course(7, 433, "Wii  Moonview Highway"),
-    Course(8, 413, "Wii  DK Summit"),
-    Course(9, 253, "MK8  Ice Ice Outpost"),
-    Course(10, 353, "3DS  Rock Rock Mountain"),
-    Course(11, 232, "GCN  Sherbet Land"),
-    Course(12, 344, "MK8  Sky-High Sundae"),
-    Course(13, 131, "MK8  Sunshine Airport"),
-    Course(14, 334, "DS   Waluigi Pinball"),
-    Course(15, 244, "N64  Rainbow Road"),
-    Course(16, 464, "Wii  Rainbow Road"),
-
-    Course(17, 443, "Wii  Koopa Cape"),
-    Course(18, 233, "3DS  Music Park"),
-    Course(19, 234, "N64  Yoshi Valley"),
-    Course(20, 343, "Wii  Mushroom Gorge"),
-    Course(21, 134, "MK8  Mount Wario"),
-    Course(22, 141, "MK8  Cloudtop Cruise"),
-    Course(23, 214, "N64  Toad's Turnpike"),
-    Course(24, 133, "MK8  Electrodrome"),
-    Course(25, 322, "DS   Shroom Ridge"),
-    Course(26, 364, "3DS  Rainbow Road"),
-    Course(27, 251, "Wii  Wario's Gold Mine"),
-    Course(28, 333, "N64  Kalimari Desert"),
-    Course(29, 453, "Wii  Daisy Circuit"),
-    Course(30, 432, "GCN  Daisy Cruiser"),
-    Course(31, 323, "GBA  Sky Garden"),
-    Course(32, 143, "MK8  Bowser's Castle"),
-
-    Course(33, 324, "Tour Ninja Hideaway"),
-    Course(34, 264, "MK8  Big Blue"),
-    Course(35, 122, "MK8  Toad Harbor"),
-    Course(36, 154, "MK8  Mute City"),
-    Course(37, 263, "MK8  Super Bell Subway"),
-    Course(38, 452, "GCN  DK Mountain"),
-    Course(39, 114, "MK8  Thwomp Ruins"),
-    Course(40, 462, "3DS  Rosalina's Ice World"),
-    Course(41, 163, "MK8  Wild Woods"),
-    Course(42, 414, "MK8  Yoshi's Island"),
-    Course(43, 242, "3DS  Piranha Plant Slide"),
-    Course(44, 213, "DS   Cheep Cheep Beach"),
-    Course(45, 254, "MK8  Hyrule Circuit"),
-    Course(46, 243, "Wii  Grumble Volcano"),
-    Course(47, 153, "MK8  Dragon Driftway"),
-    Course(48, 144, "MK8  Rainbow Road"),
-
-    Course(49, 363, "Tour Merry Mountain"),
-    Course(50, 224, "3DS  DK Jungle"),
-    Course(51, 312, "3DS  Toad Circuit"),
-    Course(52, 132, "MK8  Dolphin Shoals"),
-    Course(53, 423, "GCN  Waluigi Stadium"),
-    Course(54, 112, "MK8  Water Park"),
-    Course(55, 223, "N64  Royal Raceway"),
-    Course(56, 421, "Tour Bangkok Rush"),
-    Course(57, 123, "MK8  Twisted Mansion"),
-    Course(58, 342, "GBA  Snow Land"),
-    Course(59, 164, "MK8  Animal Crossing Circuit"),
-    Course(60, 454, "MK8  Piranha Plant Cove"),
-    Course(61, 262, "GBA  Ribbon Road"),
-    Course(62, 461, "Tour Madrid Drive"),
-    Course(63, 424, "Tour Singapore Speedway"),
-    Course(64, 463, "SNES Bowser's Castle 3"),
-
-    Course(65, 444, "Tour Vancouver Velocity"),
-    Course(66, 152, "MK8  Excitebike Arena"),
-    Course(67, 124, "MK8  Shy Guy Falls"),
-    Course(68, 113, "MK8  Sweet Sweet Canyon"),
-    Course(69, 331, "Tour New York Minute"),
-    Course(70, 111, "MK8  Mario Kart Stadium"),
-    Course(71, 442, "GBA  Sunset Wilds"),
-    Course(72, 451, "Tour Rome Avanti"),
-    Course(73, 361, "Tour Berlin Byways"),
-    Course(74, 412, "GBA  Riverside Park"),
-    Course(75, 252, "SNES Rainbow Road"),
-    Course(76, 311, "Tour Paris Promenade"),
-    Course(77, 121, "MK8  Mario Circuit"),
-    Course(78, 212, "GBA  Mario Circuit"),
-    Course(79, 332, "SNES Mario Circuit 3"),
-    Course(80, 422, "DS   Mario Circuit"),
-
-    Course(81, 352, "GBA  Boo Lake"),
-    Course(82, 221, "GCN  Dry Dry Desert"),
-    Course(83, 431, "Tour Athens Dash"),
-    Course(84, 313, "N64  Choco Mountain"),
-    Course(85, 222, "SNES Donut Plains 3"),
-    Course(86, 441, "Tour Los Angeles Laps"),
-    Course(87, 411, "Tour Amsterdam Drift"),
-    Course(88, 142, "MK8  Bone Dry Ruins"),
-    Course(89, 351, "Tour London Loop"),
-    Course(90, 261, "3DS  Neo Bowser City"),
-    Course(91, 231, "DS   Wario Stadium"),
-    Course(92, 151, "GCN  Yoshi's Circuit"),
-    Course(93, 161, "GCN  Baby Park"),
-    Course(94, 341, "Tour Sydney Sprint"),
-    Course(95, 321, "Tour Tokyo Blur"),
-    Course(96, 162, "GBA  Cheese Land"),
-])
-
 
 help_block = '''
 q/quit/exit: Stop the script.
@@ -321,9 +150,6 @@ Special:
           If you are already using a tiered list, this will abort
           and resume normal genration.
 '''
-
-
-list_file = os.path.join(os.path.dirname(os.path.realpath(__file__)), 'list.pkl')
 
 
 try:

@@ -2,7 +2,7 @@ use super::course::Course;
 use std::fmt;
 
 // An action the user takes, e.g. adding or removing a course
-#[derive(Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub enum Action {
     Add(Course),
     Remove(Course),
