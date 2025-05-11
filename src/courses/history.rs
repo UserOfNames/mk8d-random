@@ -17,6 +17,7 @@ impl fmt::Display for Action {
     }
 }
 
+#[derive(Debug)]
 pub struct History {
     past: Vec<Action>,
     future: Vec<Action>,
@@ -77,8 +78,6 @@ impl fmt::Display for History {
         Ok(())
     }
 }
-
-
 
 #[cfg(test)]
 mod tests {

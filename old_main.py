@@ -12,16 +12,6 @@ class NoMatchError(Exception):
     pass
 
 
-class Course():
-    def __init__(self, rank, coord, name):
-        self.rank = rank
-        self.coord = coord
-        self.name = name
-
-    def __str__(self):
-        return f"({self.coord}) {self.name} ({self.rank})"
-
-
 class CourseList():
     def __init__(self, course_list=[]):
         self.is_tiered = False

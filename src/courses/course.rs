@@ -44,8 +44,6 @@ impl Ord for Course {
     }
 }
 
-
-
 #[cfg(test)]
 mod tests {
     use super::*;

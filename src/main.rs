@@ -1,27 +1,32 @@
-mod lists;
-use lists::mk8d::make_mk8d;
-
+mod app;
 mod courses;
-use courses::course_list::CourseList;
+mod lists;
+
+use app::App;
 
 fn main() {
-    run();
+    let mut terminal = ratatui::init();
+    // let app_result = App::new().run(&mut terminal);
+    ratatui::restore();
+    // app_result
 }
 
-fn run() {
-    let path = "../saves/mk8d.json";
-    let mut courses = CourseList::new(path);
-
-    match courses.restore_list() {
-        Ok(_) => (),
-        Err(_) => {
-            println!("Did not find a save file, creating one...");
-            courses.list = make_mk8d();
-            courses
-                .dump_list()
-                .expect("ERROR While creating initial course list");
-        }
-    }
-
-    println!("There are {} courses in the list.", courses.list.len());
-}
+// fn run() {
+//     run();
+//
+//     let path = "../saves/mk8d.json";
+//     let mut courses = CourseList::new(path);
+//
+//     match courses.restore_list() {
+//         Ok(_) => (),
+//         Err(_) => {
+//             println!("Did not find a save file, creating one...");
+//             courses.list = make_mk8d();
+//             courses
+//                 .dump_list()
+//                 .expect("ERROR While creating initial course list");
+//         }
+//     }
+//
+//     println!("There are {} courses in the list.", courses.list.len());
+// }
