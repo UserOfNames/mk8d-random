@@ -86,19 +86,23 @@ impl CourseList {
             .collect()
     }
 
-    pub fn generate(&mut self) -> Option<()> {
+    pub fn generate(&mut self) -> Option<Course> {
         if self.current.is_empty() {
             return None;
         }
 
         let index: usize = rand::rng().random_range(0..self.current.len());
         let to_remove = self.current.iter().nth(index).cloned();
-        if let Some(c) = &to_remove {
-            self.current.remove(c);
-            Some(())
+        if let Some(c) = to_remove {
+            self.remove(c.clone());
+            Some(c)
         } else {
             None
         }
+    }
+
+    pub fn reset(&mut self) {
+        self.current.append(&mut self.removed);
     }
 
     pub fn get_history(&self) -> &History {
@@ -345,5 +349,31 @@ mod tests {
 
         hist = course_list.get_history();
         assert!(hist.has_history());
+    }
+
+    #[test]
+    fn test_reset() {
+        let file_path = tempdir().unwrap().path().join("test.json");
+        let mut course_list = CourseList::new(&file_path);
+
+        let course1 = Course::new(1, 101, "One");
+        let course2 = Course::new(2, 102, "Two");
+        let course3 = Course::new(3, 103, "Three");
+
+        course_list.add(course1.clone());
+        course_list.add(course2.clone());
+        course_list.add(course3.clone());
+        course_list.remove(course2.clone());
+        assert_eq!(course_list.current.len(), 2);
+        assert_eq!(course_list.removed.len(), 1);
+        assert_eq!(*course_list.current.first().unwrap(), course1);
+        assert_eq!(*course_list.current.last().unwrap(), course3);
+        assert_eq!(*course_list.removed.first().unwrap(), course2);
+
+        course_list.reset();
+        assert_eq!(course_list.current.len(), 3);
+        assert_eq!(course_list.removed.len(), 0);
+        assert_eq!(*course_list.current.first().unwrap(), course1);
+        assert_eq!(*course_list.current.last().unwrap(), course3);
     }
 }

@@ -110,11 +110,6 @@ class TieredList(CourseList):
             self.course_list.pop(index)
 
 
-def reset_active_list():
-    active_course_list.backup_list()
-    active_course_list.course_list = full_course_list.course_list.copy()
-
-
 help_block = '''
 q/quit/exit: Stop the script.
 To avoid accidental generation, any input besides these commands will do nothing.
