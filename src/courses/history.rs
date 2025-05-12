@@ -1,8 +1,9 @@
 use super::course::Course;
+use serde::{Deserialize, Serialize};
 use std::fmt;
 
 // An action the user takes, e.g. adding or removing a course
-#[derive(Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
 pub enum Action {
     Add(Course),
     Remove(Course),
@@ -17,7 +18,7 @@ impl fmt::Display for Action {
     }
 }
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct History {
     past: Vec<Action>,
     future: Vec<Action>,

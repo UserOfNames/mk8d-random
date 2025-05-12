@@ -6,9 +6,9 @@ use app::App;
 
 fn main() {
     let mut terminal = ratatui::init();
-    // let app_result = App::new().run(&mut terminal);
+    let app_result = App::new().run(&mut terminal);
     ratatui::restore();
-    // app_result
+    app_result
 }
 
 // fn run() {

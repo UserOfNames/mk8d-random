@@ -2,13 +2,14 @@ use super::course::Course;
 use super::history::Action;
 use super::history::History;
 use rand::{self, Rng};
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;
 use std::fmt::{self, Display, Formatter};
 use std::fs::{self, File, create_dir_all};
 use std::io::{self, Write};
 use std::path::PathBuf;
 
-#[derive(Debug)]
+#[derive(Serialize, Deserialize, Debug)]
 pub struct CourseList {
     pub current: BTreeSet<Course>,
     pub removed: BTreeSet<Course>,
@@ -33,14 +34,14 @@ impl CourseList {
         }
 
         let mut file = File::create(&self.file)?;
-        let data = serde_json::to_string_pretty(&self.current)?;
+        let data = serde_json::to_string_pretty(&self)?;
         file.write_all(data.as_bytes())?;
         Ok(())
     }
 
     pub fn restore_list(&mut self) -> io::Result<()> {
         let data = fs::read_to_string(&self.file)?;
-        self.current = serde_json::from_str(&data)?;
+        *self = serde_json::from_str(&data)?;
         Ok(())
     }
 
@@ -87,18 +88,12 @@ impl CourseList {
     }
 
     pub fn generate(&mut self) -> Option<Course> {
-        if self.current.is_empty() {
-            return None;
-        }
-
         let index: usize = rand::rng().random_range(0..self.current.len());
         let to_remove = self.current.iter().nth(index).cloned();
-        if let Some(c) = to_remove {
+        if let Some(c) = &to_remove {
             self.remove(c.clone());
-            Some(c)
-        } else {
-            None
         }
+        to_remove
     }
 
     pub fn reset(&mut self) {
