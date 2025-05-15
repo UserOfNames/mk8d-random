@@ -1,3 +1,5 @@
+use ratatui::DefaultTerminal;
+
 #[derive(Debug)]
 pub enum CurrentScreen {
     Load,      // Loading screen
@@ -20,5 +22,9 @@ impl App {
             searched: String::new(),
             current_screen: CurrentScreen::Load,
         }
+    }
+
+    pub fn run(&mut self, terminal: &mut DefaultTerminal) {
+        todo!()
     }
 }

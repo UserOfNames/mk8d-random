@@ -45,30 +45,34 @@ impl CourseList {
         Ok(())
     }
 
-    pub fn add(&mut self, course: Course) -> bool {
-        let res = self._add(course.clone());
+    pub fn add(&mut self, course: Course) -> Result<(), ()> {
+        self._add(course.clone())?;
         self.history.push(Action::Add(course));
-        res
+        Ok(())
     }
 
-    fn _add(&mut self, course: Course) -> bool {
-        let rem = self.removed.remove(&course);
-        let cur = self.current.insert(course.clone());
-
-        rem && cur
+    fn _add(&mut self, course: Course) -> Result<(), ()> {
+        self.removed.remove(&course);
+        if self.current.insert(course.clone()) {
+            Ok(())
+        } else {
+            Err(())
+        }
     }
 
-    pub fn remove(&mut self, course: Course) -> bool {
-        let res = self._remove(course.clone());
-        self.history.push(Action::Add(course));
-        res
+    pub fn remove(&mut self, course: Course) -> Result<(), ()> {
+        self._remove(course.clone())?;
+        self.history.push(Action::Remove(course));
+        Ok(())
     }
 
-    fn _remove(&mut self, course: Course) -> bool {
-        let cur = self.current.remove(&course);
-        let rem = self.removed.insert(course.clone());
-
-        rem && cur
+    fn _remove(&mut self, course: Course) -> Result<(), ()> {
+        self.current.remove(&course);
+        if self.removed.insert(course.clone()) {
+            Ok(())
+        } else {
+            Err(())
+        }
     }
 
     fn search_current(&self, searched: &str) -> BTreeSet<Course> {
@@ -173,8 +177,8 @@ mod tests {
         course_list.removed.insert(course1.clone());
         course_list.removed.insert(course2.clone());
 
-        assert!(course_list.add(course1.clone()));
-        assert!(course_list.add(course2.clone()));
+        assert!(course_list.add(course1.clone()).is_ok());
+        assert!(course_list.add(course2.clone()).is_ok());
         let mut current = course_list.current.iter();
 
         assert_eq!(course_list.current.len(), 2);
@@ -193,27 +197,27 @@ mod tests {
         course_list.removed.insert(course1.clone());
         course_list.removed.insert(course2.clone());
 
-        assert!(course_list.add(course1.clone()));
-        assert!(course_list.add(course2.clone()));
+        assert!(course_list.add(course1.clone()).is_ok());
+        assert!(course_list.add(course2.clone()).is_ok());
 
-        assert!(course_list.remove(course1.clone()));
+        assert!(course_list.remove(course1.clone()).is_ok());
         assert_eq!(course_list.current.len(), 1);
         assert_eq!(course_list.removed.len(), 1);
         assert_eq!(*course_list.current.iter().next().unwrap(), course2);
         assert_eq!(*course_list.removed.iter().next().unwrap(), course1);
 
-        assert!(!course_list.remove(course1.clone()));
+        assert!(course_list.remove(course1.clone()).is_err());
         assert_eq!(course_list.current.len(), 1);
         assert_eq!(course_list.removed.len(), 1);
         assert_eq!(*course_list.current.iter().next().unwrap(), course2);
         assert_eq!(*course_list.removed.iter().next().unwrap(), course1);
 
-        assert!(course_list.remove(course2.clone()));
+        assert!(course_list.remove(course2.clone()).is_ok());
         assert_eq!(course_list.current.len(), 0);
         assert_eq!(course_list.removed.len(), 2);
         assert_eq!(*course_list.removed.iter().next().unwrap(), course1);
 
-        assert!(!course_list.remove(course2.clone()));
+        assert!(!course_list.remove(course2.clone()).is_ok());
         assert_eq!(course_list.current.len(), 0);
         assert_eq!(course_list.removed.len(), 2);
         assert_eq!(*course_list.removed.iter().next().unwrap(), course1);
@@ -227,8 +231,8 @@ mod tests {
         let course1 = Course::new(1, 111, "One");
         let course2 = Course::new(2, 112, "Two");
 
-        course_list.add(course1);
-        course_list.add(course2);
+        course_list.add(course1).unwrap();
+        course_list.add(course2).unwrap();
 
         course_list.dump_list().expect("Failed to dump list");
 
@@ -254,11 +258,11 @@ mod tests {
         let course3 = Course::new(3, 103, "Three");
         let course4 = Course::new(4, 104, "Four");
 
-        course_list.add(course1);
-        course_list.add(course2);
-        course_list.add(course3);
-        course_list.add(course4.clone());
-        course_list.remove(course4);
+        course_list.add(course1).unwrap();
+        course_list.add(course2).unwrap();
+        course_list.add(course3).unwrap();
+        course_list.add(course4.clone()).unwrap();
+        course_list.remove(course4).unwrap();
 
         let mut current = course_list.search_current("t").into_iter();
         let mut removed = course_list.search_removed("f").into_iter();
@@ -280,8 +284,8 @@ mod tests {
         let course1 = Course::new(1, 101, "One");
         let course2 = Course::new(2, 102, "Two");
 
-        course_list.add(course1.clone());
-        course_list.add(course2.clone());
+        course_list.add(course1.clone()).unwrap();
+        course_list.add(course2.clone()).unwrap();
 
         assert!(course_list.generate().is_some());
         assert_eq!(course_list.current.len(), 1);
@@ -295,8 +299,8 @@ mod tests {
         let file_path = tempdir().unwrap().path().join("test.json");
         let mut course_list = CourseList::new(&file_path);
 
-        course_list.add(Course::new(1, 101, "One"));
-        course_list.add(Course::new(2, 102, "Two"));
+        course_list.add(Course::new(1, 101, "One")).unwrap();
+        course_list.add(Course::new(2, 102, "Two")).unwrap();
         assert_eq!(course_list.to_string(), "(101, 01) One\n(102, 02) Two");
     }
 
@@ -308,8 +312,8 @@ mod tests {
         let course1 = Course::new(1, 101, "One");
         let course2 = Course::new(2, 102, "Two");
 
-        course_list.add(course1.clone());
-        course_list.add(course2.clone());
+        course_list.add(course1.clone()).unwrap();
+        course_list.add(course2.clone()).unwrap();
 
         course_list.roll_back().unwrap();
         assert_eq!(course_list.current.len(), 1);
@@ -337,10 +341,10 @@ mod tests {
         let course2 = Course::new(2, 102, "Two");
         let course3 = Course::new(3, 103, "Three");
 
-        course_list.add(course1.clone());
-        course_list.add(course2.clone());
-        course_list.add(course3.clone());
-        course_list.remove(course2.clone());
+        course_list.add(course1.clone()).unwrap();
+        course_list.add(course2.clone()).unwrap();
+        course_list.add(course3.clone()).unwrap();
+        course_list.remove(course2.clone()).unwrap();
 
         hist = course_list.get_history();
         assert!(hist.has_history());
@@ -355,10 +359,10 @@ mod tests {
         let course2 = Course::new(2, 102, "Two");
         let course3 = Course::new(3, 103, "Three");
 
-        course_list.add(course1.clone());
-        course_list.add(course2.clone());
-        course_list.add(course3.clone());
-        course_list.remove(course2.clone());
+        course_list.add(course1.clone()).unwrap();
+        course_list.add(course2.clone()).unwrap();
+        course_list.add(course3.clone()).unwrap();
+        course_list.remove(course2.clone()).unwrap();
         assert_eq!(course_list.current.len(), 2);
         assert_eq!(course_list.removed.len(), 1);
         assert_eq!(*course_list.current.first().unwrap(), course1);
