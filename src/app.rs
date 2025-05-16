@@ -1,4 +1,5 @@
-use ratatui::DefaultTerminal;
+use ratatui::{DefaultTerminal, backend::Backend};
+use std::io;
 
 #[derive(Debug)]
 pub enum CurrentScreen {
@@ -14,6 +15,7 @@ pub enum CurrentScreen {
 pub struct App {
     pub searched: String,
     pub current_screen: CurrentScreen,
+    exit: bool,
 }
 
 impl App {
@@ -21,10 +23,14 @@ impl App {
         App {
             searched: String::new(),
             current_screen: CurrentScreen::Load,
+            exit: false,
         }
     }
 
-    pub fn run(&mut self, terminal: &mut DefaultTerminal) {
-        todo!()
+    pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
+        while !self.exit {
+        }
+
+        Ok(())
     }
 }
