@@ -18,7 +18,7 @@ pub struct CourseList {
 }
 
 impl CourseList {
-    pub fn new(path: impl Into<PathBuf>) -> CourseList {
+    pub fn new(path: impl Into<PathBuf>) -> Self {
         CourseList {
             current: BTreeSet::new(),
             removed: BTreeSet::new(),
