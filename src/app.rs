@@ -18,13 +18,14 @@ pub enum CurrentScreen {
     SearchIn,  // Filter current
     SearchOut, // Filter removed
     Tiered,    // Tiered sublist
+    Quitting,  // Quit confirmation screen
 }
 
 #[derive(Debug)]
 pub struct App {
     pub current_screen: CurrentScreen,
     pub course_list: CourseList,
-    exit: bool,
+    quit: bool,
 }
 
 impl App {
@@ -32,12 +33,12 @@ impl App {
         App {
             course_list: CourseList::new("PLACEHOLDER"),
             current_screen: CurrentScreen::Load,
-            exit: false,
+            quit: false,
         }
     }
 
     pub fn run(&mut self, terminal: &mut DefaultTerminal) -> io::Result<()> {
-        while !self.exit {
+        while !self.quit {
             terminal.draw(|frame| self.draw(frame))?;
             self.handle_events()?;
         }
@@ -57,15 +58,64 @@ impl App {
         Ok(())
     }
 
-    fn handle_key_event(&mut self, key_event: KeyEvent) {
-        match key_event.code {
-            KeyCode::Char('q') => self.exit(),
-            KeyCode::Char('L') => self.load_screen(),
-            KeyCode::Char('i') => self.in_screen(),
-            KeyCode::Char('o') => self.out_screen(),
-            KeyCode::Char('s') => self.search(),
-            KeyCode::Char('t') => self.tier(),
-            _ => {}
+    fn handle_key_event(&mut self, key: KeyEvent) {
+        match self.current_screen {
+            CurrentScreen::Load => self.handle_load(key),
+            CurrentScreen::In => self.handle_in(key),
+            CurrentScreen::Out => self.handle_out(key),
+            CurrentScreen::SearchIn => self.handle_search_in(key),
+            CurrentScreen::SearchOut => self.handle_search_out(key),
+            CurrentScreen::Tiered => self.handle_tiered(key),
+            CurrentScreen::Quitting => self.handle_quitting(key),
+        }
+    }
+
+    fn handle_load(&mut self, key: KeyEvent) {
+        match key.code {
+            KeyCode::Char('q') => self.quit(),
+            _ => {},
+        }
+    }
+
+    fn handle_in(&mut self, key: KeyEvent) {
+        match key.code {
+            KeyCode::Char('q') => self.quit(),
+            _ => {},
+        }
+    }
+
+    fn handle_out(&mut self, key: KeyEvent) {
+        match key.code {
+            KeyCode::Char('q') => self.quit(),
+            _ => {},
+        }
+    }
+
+    fn handle_search_in(&mut self, key: KeyEvent) {
+        match key.code {
+            KeyCode::Char('q') => self.quit(),
+            _ => {},
+        }
+    }
+
+    fn handle_search_out(&mut self, key: KeyEvent) {
+        match key.code {
+            KeyCode::Char('q') => self.quit(),
+            _ => {},
+        }
+    }
+
+    fn handle_tiered(&mut self, key: KeyEvent) {
+        match key.code {
+            KeyCode::Char('q') => self.quit(),
+            _ => {},
+        }
+    }
+
+    fn handle_quitting(&mut self, key: KeyEvent) {
+        match key.code {
+            KeyCode::Char('y') => self.quit(),
+            _ => {},
         }
     }
 
@@ -73,9 +123,8 @@ impl App {
         todo!("Draw logic")
     }
 
-    fn exit(&mut self) {
+    fn quit(&mut self) {
         todo!("Exit confirmation popup and save logic");
-        self.exit = true;
     }
 
     fn load_screen(&mut self) {
