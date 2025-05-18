@@ -1,3 +1,5 @@
+use crate::courses::course_list::CourseList;
+
 use ratatui::{
     DefaultTerminal, Frame,
     backend::Backend,
@@ -6,9 +8,8 @@ use ratatui::{
     layout::Rect,
     widgets::Widget,
 };
-use std::{io, path::PathBuf};
 
-use crate::courses::course_list::CourseList;
+use std::{io, path::PathBuf};
 
 #[derive(Debug)]
 pub enum CurrentScreen {
@@ -31,7 +32,7 @@ pub struct App {
 impl App {
     pub fn new() -> Self {
         App {
-            course_list: CourseList::new("PLACEHOLDER"),
+            course_list: CourseList::new(""),
             current_screen: CurrentScreen::Load,
             quit: false,
         }
@@ -73,49 +74,49 @@ impl App {
     fn handle_load(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Char('q') => self.quit(),
-            _ => {},
+            _ => {}
         }
     }
 
     fn handle_in(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Char('q') => self.quit(),
-            _ => {},
+            _ => {}
         }
     }
 
     fn handle_out(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Char('q') => self.quit(),
-            _ => {},
+            _ => {}
         }
     }
 
     fn handle_search_in(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Char('q') => self.quit(),
-            _ => {},
+            _ => {}
         }
     }
 
     fn handle_search_out(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Char('q') => self.quit(),
-            _ => {},
+            _ => {}
         }
     }
 
     fn handle_tiered(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Char('q') => self.quit(),
-            _ => {},
+            _ => {}
         }
     }
 
     fn handle_quitting(&mut self, key: KeyEvent) {
         match key.code {
             KeyCode::Char('y') => self.quit(),
-            _ => {},
+            _ => {}
         }
     }
 

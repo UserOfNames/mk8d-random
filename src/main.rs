@@ -1,6 +1,7 @@
 mod app;
 mod courses;
 mod lists;
+mod ui;
 
 use std::io;
 
