@@ -1,0 +1,482 @@
+[
+  {
+    "name": "Wii  Coconut Mall",
+    "coord": 314,
+    "rank": 1
+  },
+  {
+    "name": "Wii  Maple Treeway",
+    "coord": 354,
+    "rank": 2
+  },
+  {
+    "name": "Wii  Moo Moo Meadows",
+    "coord": 211,
+    "rank": 3
+  },
+  {
+    "name": "MK8  Squeaky Clean Sprint",
+    "coord": 434,
+    "rank": 4
+  },
+  {
+    "name": "DS   Tick Tock Clock",
+    "coord": 241,
+    "rank": 5
+  },
+  {
+    "name": "DS   Peach Gardens",
+    "coord": 362,
+    "rank": 6
+  },
+  {
+    "name": "Wii  Moonview Highway",
+    "coord": 433,
+    "rank": 7
+  },
+  {
+    "name": "Wii  DK Summit",
+    "coord": 413,
+    "rank": 8
+  },
+  {
+    "name": "MK8  Ice Ice Outpost",
+    "coord": 253,
+    "rank": 9
+  },
+  {
+    "name": "3DS  Rock Rock Mountain",
+    "coord": 353,
+    "rank": 10
+  },
+  {
+    "name": "GCN  Sherbet Land",
+    "coord": 232,
+    "rank": 11
+  },
+  {
+    "name": "MK8  Sky-High Sundae",
+    "coord": 344,
+    "rank": 12
+  },
+  {
+    "name": "MK8  Sunshine Airport",
+    "coord": 131,
+    "rank": 13
+  },
+  {
+    "name": "DS   Waluigi Pinball",
+    "coord": 334,
+    "rank": 14
+  },
+  {
+    "name": "N64  Rainbow Road",
+    "coord": 244,
+    "rank": 15
+  },
+  {
+    "name": "Wii  Rainbow Road",
+    "coord": 464,
+    "rank": 16
+  },
+  {
+    "name": "Wii  Koopa Cape",
+    "coord": 443,
+    "rank": 17
+  },
+  {
+    "name": "3DS  Music Park",
+    "coord": 233,
+    "rank": 18
+  },
+  {
+    "name": "N64  Yoshi Valley",
+    "coord": 234,
+    "rank": 19
+  },
+  {
+    "name": "Wii  Mushroom Gorge",
+    "coord": 343,
+    "rank": 20
+  },
+  {
+    "name": "MK8  Mount Wario",
+    "coord": 134,
+    "rank": 21
+  },
+  {
+    "name": "MK8  Cloudtop Cruise",
+    "coord": 141,
+    "rank": 22
+  },
+  {
+    "name": "N64  Toad's Turnpike",
+    "coord": 214,
+    "rank": 23
+  },
+  {
+    "name": "MK8  Electrodrome",
+    "coord": 133,
+    "rank": 24
+  },
+  {
+    "name": "DS   Shroom Ridge",
+    "coord": 322,
+    "rank": 25
+  },
+  {
+    "name": "3DS  Rainbow Road",
+    "coord": 364,
+    "rank": 26
+  },
+  {
+    "name": "Wii  Wario's Gold Mine",
+    "coord": 251,
+    "rank": 27
+  },
+  {
+    "name": "N64  Kalimari Desert",
+    "coord": 333,
+    "rank": 28
+  },
+  {
+    "name": "Wii  Daisy Circuit",
+    "coord": 453,
+    "rank": 29
+  },
+  {
+    "name": "GCN  Daisy Cruiser",
+    "coord": 432,
+    "rank": 30
+  },
+  {
+    "name": "GBA  Sky Garden",
+    "coord": 323,
+    "rank": 31
+  },
+  {
+    "name": "MK8  Bowser's Castle",
+    "coord": 143,
+    "rank": 32
+  },
+  {
+    "name": "Tour Ninja Hideaway",
+    "coord": 324,
+    "rank": 33
+  },
+  {
+    "name": "MK8  Big Blue",
+    "coord": 264,
+    "rank": 34
+  },
+  {
+    "name": "MK8  Toad Harbor",
+    "coord": 122,
+    "rank": 35
+  },
+  {
+    "name": "MK8  Mute City",
+    "coord": 154,
+    "rank": 36
+  },
+  {
+    "name": "MK8  Super Bell Subway",
+    "coord": 263,
+    "rank": 37
+  },
+  {
+    "name": "GCN  DK Mountain",
+    "coord": 452,
+    "rank": 38
+  },
+  {
+    "name": "MK8  Thwomp Ruins",
+    "coord": 114,
+    "rank": 39
+  },
+  {
+    "name": "3DS  Rosalina's Ice World",
+    "coord": 462,
+    "rank": 40
+  },
+  {
+    "name": "MK8  Wild Woods",
+    "coord": 163,
+    "rank": 41
+  },
+  {
+    "name": "MK8  Yoshi's Island",
+    "coord": 414,
+    "rank": 42
+  },
+  {
+    "name": "3DS  Piranha Plant Slide",
+    "coord": 242,
+    "rank": 43
+  },
+  {
+    "name": "DS   Cheep Cheep Beach",
+    "coord": 213,
+    "rank": 44
+  },
+  {
+    "name": "MK8  Hyrule Circuit",
+    "coord": 254,
+    "rank": 45
+  },
+  {
+    "name": "Wii  Grumble Volcano",
+    "coord": 243,
+    "rank": 46
+  },
+  {
+    "name": "MK8  Dragon Driftway",
+    "coord": 153,
+    "rank": 47
+  },
+  {
+    "name": "MK8  Rainbow Road",
+    "coord": 144,
+    "rank": 48
+  },
+  {
+    "name": "Tour Merry Mountain",
+    "coord": 363,
+    "rank": 49
+  },
+  {
+    "name": "3DS  DK Jungle",
+    "coord": 224,
+    "rank": 50
+  },
+  {
+    "name": "3DS  Toad Circuit",
+    "coord": 312,
+    "rank": 51
+  },
+  {
+    "name": "MK8  Dolphin Shoals",
+    "coord": 132,
+    "rank": 52
+  },
+  {
+    "name": "GCN  Waluigi Stadium",
+    "coord": 423,
+    "rank": 53
+  },
+  {
+    "name": "MK8  Water Park",
+    "coord": 112,
+    "rank": 54
+  },
+  {
+    "name": "N64  Royal Raceway",
+    "coord": 223,
+    "rank": 55
+  },
+  {
+    "name": "Tour Bangkok Rush",
+    "coord": 421,
+    "rank": 56
+  },
+  {
+    "name": "MK8  Twisted Mansion",
+    "coord": 123,
+    "rank": 57
+  },
+  {
+    "name": "GBA  Snow Land",
+    "coord": 342,
+    "rank": 58
+  },
+  {
+    "name": "MK8  Animal Crossing Circuit",
+    "coord": 164,
+    "rank": 59
+  },
+  {
+    "name": "MK8  Piranha Plant Cove",
+    "coord": 454,
+    "rank": 60
+  },
+  {
+    "name": "GBA  Ribbon Road",
+    "coord": 262,
+    "rank": 61
+  },
+  {
+    "name": "Tour Madrid Drive",
+    "coord": 461,
+    "rank": 62
+  },
+  {
+    "name": "Tour Singapore Speedway",
+    "coord": 424,
+    "rank": 63
+  },
+  {
+    "name": "SNES Bowser's Castle 3",
+    "coord": 463,
+    "rank": 64
+  },
+  {
+    "name": "Tour Vancouver Velocity",
+    "coord": 444,
+    "rank": 65
+  },
+  {
+    "name": "MK8  Excitebike Arena",
+    "coord": 152,
+    "rank": 66
+  },
+  {
+    "name": "MK8  Shy Guy Falls",
+    "coord": 124,
+    "rank": 67
+  },
+  {
+    "name": "MK8  Sweet Sweet Canyon",
+    "coord": 113,
+    "rank": 68
+  },
+  {
+    "name": "Tour New York Minute",
+    "coord": 331,
+    "rank": 69
+  },
+  {
+    "name": "MK8  Mario Kart Stadium",
+    "coord": 111,
+    "rank": 70
+  },
+  {
+    "name": "GBA  Sunset Wilds",
+    "coord": 442,
+    "rank": 71
+  },
+  {
+    "name": "Tour Rome Avanti",
+    "coord": 451,
+    "rank": 72
+  },
+  {
+    "name": "Tour Berlin Byways",
+    "coord": 361,
+    "rank": 73
+  },
+  {
+    "name": "GBA  Riverside Park",
+    "coord": 412,
+    "rank": 74
+  },
+  {
+    "name": "SNES Rainbow Road",
+    "coord": 252,
+    "rank": 75
+  },
+  {
+    "name": "Tour Paris Promenade",
+    "coord": 311,
+    "rank": 76
+  },
+  {
+    "name": "MK8  Mario Circuit",
+    "coord": 121,
+    "rank": 77
+  },
+  {
+    "name": "GBA  Mario Circuit",
+    "coord": 212,
+    "rank": 78
+  },
+  {
+    "name": "SNES Mario Circuit 3",
+    "coord": 332,
+    "rank": 79
+  },
+  {
+    "name": "DS   Mario Circuit",
+    "coord": 422,
+    "rank": 80
+  },
+  {
+    "name": "GBA  Boo Lake",
+    "coord": 352,
+    "rank": 81
+  },
+  {
+    "name": "GCN  Dry Dry Desert",
+    "coord": 221,
+    "rank": 82
+  },
+  {
+    "name": "Tour Athens Dash",
+    "coord": 431,
+    "rank": 83
+  },
+  {
+    "name": "N64  Choco Mountain",
+    "coord": 313,
+    "rank": 84
+  },
+  {
+    "name": "SNES Donut Plains 3",
+    "coord": 222,
+    "rank": 85
+  },
+  {
+    "name": "Tour Los Angeles Laps",
+    "coord": 441,
+    "rank": 86
+  },
+  {
+    "name": "Tour Amsterdam Drift",
+    "coord": 411,
+    "rank": 87
+  },
+  {
+    "name": "MK8  Bone Dry Ruins",
+    "coord": 142,
+    "rank": 88
+  },
+  {
+    "name": "Tour London Loop",
+    "coord": 351,
+    "rank": 89
+  },
+  {
+    "name": "3DS  Neo Bowser City",
+    "coord": 261,
+    "rank": 90
+  },
+  {
+    "name": "DS   Wario Stadium",
+    "coord": 231,
+    "rank": 91
+  },
+  {
+    "name": "GCN  Yoshi's Circuit",
+    "coord": 151,
+    "rank": 92
+  },
+  {
+    "name": "GCN  Baby Park",
+    "coord": 161,
+    "rank": 93
+  },
+  {
+    "name": "Tour Sydney Sprint",
+    "coord": 341,
+    "rank": 94
+  },
+  {
+    "name": "Tour Tokyo Blur",
+    "coord": 321,
+    "rank": 95
+  },
+  {
+    "name": "GBA  Cheese Land",
+    "coord": 162,
+    "rank": 96
+  }
+]
