@@ -1,7 +1,9 @@
 use crate::courses::course::Course;
 
-pub fn make_mk8d() -> Vec<Course> {
-    vec![
+use std::collections::BTreeSet;
+
+pub fn make_mk8d() -> BTreeSet<Course> {
+    BTreeSet::from([
         Course::new(1, 314, "Wii  Coconut Mall"),
         Course::new(2, 354, "Wii  Maple Treeway"),
         Course::new(3, 211, "Wii  Moo Moo Meadows"),
@@ -98,5 +100,5 @@ pub fn make_mk8d() -> Vec<Course> {
         Course::new(94, 341, "Tour Sydney Sprint"),
         Course::new(95, 321, "Tour Tokyo Blur"),
         Course::new(96, 162, "GBA  Cheese Land"),
-    ]
+    ])
 }

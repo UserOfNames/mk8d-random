@@ -1,8 +1,10 @@
 use super::course::Course;
 use super::history::Action;
 use super::history::History;
+
 use rand::{self, Rng};
 use serde::{Deserialize, Serialize};
+
 use std::collections::BTreeSet;
 use std::fmt::{self, Display, Formatter};
 use std::fs::{self, File, create_dir_all};
