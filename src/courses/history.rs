@@ -52,6 +52,11 @@ impl History {
     pub fn has_history(&self) -> bool {
         return !self.past.is_empty();
     }
+
+    pub fn reset(&mut self) {
+        self.past.clear();
+        self.future.clear();
+    }
 }
 
 impl fmt::Display for History {

@@ -1,8 +1,9 @@
 use ratatui::{layout::{Constraint, Direction, Layout, Rect}, Frame};
 
-use crate::app::App;
+use crate::app::TUI;
 
-fn ui(frame: &mut Frame, app: &App) {
+impl TUI {
+    pub fn draw(&self, frame: &mut Frame) {}
 }
 
 pub fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {

@@ -23,15 +23,15 @@ pub enum CurrentScreen {
 }
 
 #[derive(Debug)]
-pub struct App {
+pub struct TUI {
     pub current_screen: CurrentScreen,
     pub course_list: CourseList,
     quit: bool,
 }
 
-impl App {
+impl TUI {
     pub fn new() -> Self {
-        App {
+        TUI {
             course_list: CourseList::new(""),
             current_screen: CurrentScreen::Load,
             quit: false,
@@ -45,8 +45,6 @@ impl App {
         }
         Ok(())
     }
-
-    fn draw(&self, frame: &mut Frame) {}
 
     fn handle_events(&mut self) -> io::Result<()> {
         match event::read()? {

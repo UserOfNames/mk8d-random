@@ -6,7 +6,6 @@ use rand::{self, Rng};
 use serde::{Deserialize, Serialize};
 
 use std::collections::BTreeSet;
-use std::fmt::{self, Display, Formatter};
 use std::fs::{self, File, create_dir_all};
 use std::io::{self, Write};
 use std::path::PathBuf;
@@ -82,16 +81,41 @@ impl CourseList {
     }
 
     pub fn get_random(&self) -> Option<&Course> {
+        if self.current.is_empty() {
+            return None;
+        };
+
         let index: usize = rand::rng().random_range(0..self.current.len());
         self.current.iter().nth(index)
     }
 
     pub fn reset(&mut self) {
         self.current.append(&mut self.removed);
+        self.history.reset();
     }
 
     pub fn get_history(&self) -> &History {
         &self.history
+    }
+
+    pub fn print_current(&self) {
+        if self.current.is_empty() {
+            println!("Course list is empty.");
+            return;
+        }
+
+        let strings: Vec<String> = self.current.iter().map(|c| c.to_string()).collect();
+        println!("{}", strings.join("\n"));
+    }
+
+    pub fn print_removed(&self) {
+        if self.removed.is_empty() {
+            println!("No courses have been used.");
+            return;
+        }
+
+        let strings: Vec<String> = self.removed.iter().map(|c| c.to_string()).collect();
+        println!("{}", strings.join("\n"));
     }
 
     pub fn roll_back(&mut self) -> Result<(), ()> {
@@ -118,13 +142,6 @@ impl CourseList {
             Action::Add(c) => self._remove(c),
             Action::Remove(c) => self._add(c),
         };
-    }
-}
-
-impl Display for CourseList {
-    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        let strings: Vec<String> = self.current.iter().map(|c| c.to_string()).collect();
-        write!(f, "{}", strings.join("\n"))
     }
 }
 
@@ -272,16 +289,6 @@ mod tests {
         let b = course_list.get_random().unwrap();
         course_list.remove(b.clone());
         assert_eq!(course_list.current.len(), 0);
-    }
-
-    #[test]
-    fn test_display_list() {
-        let file_path = tempdir().unwrap().path().join("test.json");
-        let mut course_list = CourseList::new(&file_path);
-
-        course_list.add(Course::new(1, 101, "One"));
-        course_list.add(Course::new(2, 102, "Two"));
-        assert_eq!(course_list.to_string(), "(101, 01) One\n(102, 02) Two");
     }
 
     #[test]
