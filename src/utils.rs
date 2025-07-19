@@ -1,4 +1,6 @@
-use std::io::{self, Write};
+// TODO: Organize this
+
+use std::{collections::BTreeSet, fmt, io::{self, Write}};
 
 #[macro_export]
 macro_rules! continue_on_err {

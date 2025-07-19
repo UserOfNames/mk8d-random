@@ -1,14 +1,15 @@
 use std::fs::DirEntry;
 use std::io;
 
+use crate::courses::course::Course;
 use crate::courses::course_list::CourseList;
 
 use mk8d_random::continue_on_err;
 use mk8d_random::utils::get_input;
 
 pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
-    let mut input: String;
-    let index: usize;
+    let mut input: String; // Used for all user input
+    let mut index: usize; // Used for all indexes
 
     println!("Enter the number of the save you want to use:");
     for (i, de) in saves.iter().enumerate() {
@@ -63,13 +64,33 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
             "q" | "quit" => {
                 println!("Quitting...");
                 break;
-            },
+            }
 
             "help" => help(),
 
-            "remaining" | "re" | "ls" => course_list.print_current(),
+            "remaining" | "re" | "ls" => {
+                let current = course_list.get_current();
+                if current.is_empty() {
+                    println!("Course list is empty.");
+                    continue;
+                }
 
-            "used" => course_list.print_removed(),
+                let strings: Vec<String> = current.iter().map(|c| c.to_string()).collect();
+                println!("{}", strings.join("\n"));
+                println!("There are {} courses in the list.", current.len())
+            }
+
+            "used" => {
+                let removed = course_list.get_removed();
+                if removed.is_empty() {
+                    println!("No courses have been used.");
+                    continue;
+                }
+
+                let strings: Vec<String> = removed.iter().map(|c| c.to_string()).collect();
+                println!("{}", strings.join("\n"));
+                println!("{} courses have been used.", removed.len())
+            }
 
             "history" => println!("{}", course_list.get_history()),
 
@@ -104,11 +125,55 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
                 }
             }
 
-            "add" => todo!(),
+            "add" => {
+                input = continue_on_err!(get_input("Search courses: "), "Error reading input");
 
-            "remove" | "rm" | "pop" => todo!(),
+                let mut results: Vec<&Course> =
+                    course_list.search_removed(&input).into_iter().collect();
+                results.sort();
 
-            "tier" => todo!(),
+                for (i, c) in results.iter().enumerate() {
+                    println!("{}: {}", i + 1, c);
+                }
+
+                input = continue_on_err!(
+                    get_input("Select the number of the course to add: "),
+                    "Error reading input"
+                );
+                index = continue_on_err!(input.parse(), "Error parsing number");
+                let Some(&selection) = results.get(index.wrapping_sub(1)) else {
+                    eprintln!("Error selecting course: Out of bounds selection");
+                    continue;
+                };
+
+                course_list.add(selection.clone());
+            }
+
+            "remove" | "rm" | "pop" => {
+                input = continue_on_err!(get_input("Search courses: "), "Error reading input");
+
+                let mut results: Vec<&Course> =
+                    course_list.search_current(&input).into_iter().collect();
+                results.sort();
+
+                for (i, c) in results.iter().enumerate() {
+                    println!("{}: {}", i + 1, c);
+                }
+
+                input = continue_on_err!(
+                    get_input("Select the number of the course to remove: "),
+                    "Error reading input"
+                );
+                index = continue_on_err!(input.parse(), "Error parsing number");
+                let Some(&selection) = results.get(index.wrapping_sub(1)) else {
+                    eprintln!("Error selecting course: Out of bounds selection");
+                    continue;
+                };
+
+                course_list.remove(selection.clone());
+            }
+
+            "tier" => {}
 
             _ => println!("Unrecognized command."),
         }

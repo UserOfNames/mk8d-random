@@ -12,9 +12,9 @@ use std::path::PathBuf;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseList {
-    pub current: BTreeSet<Course>,
-    pub removed: BTreeSet<Course>,
-    pub file: PathBuf,
+    current: BTreeSet<Course>,
+    removed: BTreeSet<Course>,
+    file: PathBuf,
     history: History,
 }
 
@@ -66,14 +66,14 @@ impl CourseList {
         self.removed.insert(course);
     }
 
-    fn search_current(&self, searched: &str) -> BTreeSet<&Course> {
+    pub fn search_current(&self, searched: &str) -> BTreeSet<&Course> {
         self.current
             .iter()
             .filter(|c| c.name.to_lowercase().contains(&searched.to_lowercase()))
             .collect()
     }
 
-    fn search_removed(&self, searched: &str) -> BTreeSet<&Course> {
+    pub fn search_removed(&self, searched: &str) -> BTreeSet<&Course> {
         self.removed
             .iter()
             .filter(|c| c.name.to_lowercase().contains(&searched.to_lowercase()))
@@ -98,24 +98,12 @@ impl CourseList {
         &self.history
     }
 
-    pub fn print_current(&self) {
-        if self.current.is_empty() {
-            println!("Course list is empty.");
-            return;
-        }
-
-        let strings: Vec<String> = self.current.iter().map(|c| c.to_string()).collect();
-        println!("{}", strings.join("\n"));
+    pub fn get_current(&self) -> &BTreeSet<Course> {
+        &self.current
     }
 
-    pub fn print_removed(&self) {
-        if self.removed.is_empty() {
-            println!("No courses have been used.");
-            return;
-        }
-
-        let strings: Vec<String> = self.removed.iter().map(|c| c.to_string()).collect();
-        println!("{}", strings.join("\n"));
+    pub fn get_removed(&self) -> &BTreeSet<Course> {
+        &self.removed
     }
 
     pub fn roll_back(&mut self) -> Result<(), ()> {
