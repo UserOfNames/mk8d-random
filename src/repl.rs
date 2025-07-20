@@ -6,10 +6,11 @@ use crate::courses::course_list::CourseList;
 
 use mk8d_random::continue_on_err;
 use mk8d_random::utils::get_input;
+use rand::Rng;
 
 pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
     let mut input: String; // Used for all user input
-    let mut index: usize; // Used for all indexes
+    let mut index: usize;  // Used for all indexes
 
     println!("Enter the number of the save you want to use:");
     for (i, de) in saves.iter().enumerate() {
@@ -49,7 +50,7 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
     loop {
         input = continue_on_err!(get_input(":> "), "Error reading input");
 
-        match input.to_lowercase().as_ref() {
+        match input.trim().to_lowercase().as_ref() {
             "" => {
                 let Some(course) = course_list.get_random() else {
                     println!("The course list is empty. Resetting.");
@@ -62,11 +63,32 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
             }
 
             "q" | "quit" => {
+                println!("Save changes before quitting? (Y/N): ");
+                input = continue_on_err!(get_input(":> "), "Error reading input");
+                match input.trim().to_lowercase().as_ref() {
+                    "y" => {
+                        continue_on_err!(course_list.dump_list(), "Error saving list");
+                        println!("Saved successfully.");
+                    }
+
+                    "n" => {}
+
+                    _ => {
+                        println!("Please select Y/N.");
+                        continue;
+                    }
+                }
+
                 println!("Quitting...");
                 break;
             }
 
             "help" => help(),
+
+            "save" => {
+                continue_on_err!(course_list.dump_list(), "Error saving list");
+                println!("Saved successfully.");
+            }
 
             "remaining" | "re" | "ls" => {
                 let current = course_list.get_current();
@@ -173,7 +195,28 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
                 course_list.remove(selection.clone());
             }
 
-            "tier" => {}
+            "tier" => {
+                input = continue_on_err!(get_input("Enter the size of the prix: "), "Error reading input");
+                let size: usize = continue_on_err!(input.parse());
+
+                let tiered_courses = match course_list.get_random_by_chunks(size) {
+                    Ok(c) => c,
+                    Err(_) => {
+                        eprintln!(
+                            "Error: Could not divide courses into tiers.\n\
+                            This probably means the course list cannot be evenly divided by the given prix size.\n\
+                            Consider adding or removing courses until the list is evenly divisible."
+                        );
+                        continue;
+                    }
+                };
+
+                if run_tiered_list(tiered_courses.clone()) {
+                    for course in tiered_courses {
+                        course_list.remove(course);
+                    }
+                }
+            }
 
             _ => println!("Unrecognized command."),
         }
@@ -187,8 +230,9 @@ fn help() {
 
     println!(
         "Blank input: Generate and remove a random course.\n\
-        q, quit:      Stop the script.\n\
-        help:         Show this help text.\n"
+        q, quit:      Exit.\n\
+        help:         Show this help text.\n\
+        save:         Save the list."
     );
 
     println!(
@@ -213,4 +257,41 @@ fn help() {
     );
 
     println!("---------------------------------------------------");
+}
+
+fn run_tiered_list(mut list: Vec<Course>) -> bool {
+    let mut rng = rand::rng();
+    println!(
+        "Entered tiered list. Type 'back' to return without removing the selected courses."
+    );
+
+    let mut input: String;
+    while !list.is_empty() {
+        input = continue_on_err!(get_input(":> "), "Error reading input");
+        
+        match input.trim().to_lowercase().as_ref() {
+            "" => {
+                let index = rng.random_range(0..list.len());
+                println!("{}", list[index]);
+                list.remove(index);
+            }
+
+            "back" => {
+                println!("Returning to main list...");
+                return false;
+            }
+
+            "ls" => {
+                let strings: Vec<String> = list.iter().map(|c| c.to_string()).collect();
+                println!("{}", strings.join("\n"));
+            }
+
+            _ => {
+                println!("Unrecognized command.");
+            }
+        }
+    }
+
+    println!("Tiered list exhausted. Returning to main list...");
+    true
 }

@@ -2,6 +2,7 @@ use super::course::Course;
 use super::history::Action;
 use super::history::History;
 
+use rand::seq::IndexedRandom;
 use rand::{self, Rng};
 use serde::{Deserialize, Serialize};
 
@@ -22,6 +23,15 @@ impl CourseList {
     pub fn new(path: impl Into<PathBuf>) -> Self {
         CourseList {
             current: BTreeSet::new(),
+            removed: BTreeSet::new(),
+            file: path.into(),
+            history: History::new(),
+        }
+    }
+
+    pub fn new_with_list(path: impl Into<PathBuf>, list: BTreeSet<Course>) -> Self {
+        CourseList {
+            current: list,
             removed: BTreeSet::new(),
             file: path.into(),
             history: History::new(),
@@ -87,6 +97,27 @@ impl CourseList {
 
         let index: usize = rand::rng().random_range(0..self.current.len());
         self.current.iter().nth(index)
+    }
+
+    pub fn get_random_by_chunks(&self, num_chunks: usize) -> Result<Vec<Course>, ()> {
+        let curr_vec: Vec<Course> = self.current.iter().cloned().collect();
+        let len = self.current.len();
+
+        if len % num_chunks != 0 {
+            return Err(());
+        }
+        let chunk_size = len / num_chunks;
+
+        let mut rng = rand::rng();
+        let mut res: Vec<Course> = Vec::with_capacity(num_chunks);
+
+        for chunk in curr_vec.chunks_exact(chunk_size) {
+            // We already validated the chunks, so unwrap() is fine here
+            let selection = chunk.choose(&mut rng).unwrap();
+            res.push(selection.clone());
+        }
+
+        Ok(res)
     }
 
     pub fn reset(&mut self) {

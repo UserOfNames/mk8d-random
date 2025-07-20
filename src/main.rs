@@ -14,6 +14,8 @@ use dirs;
 use std::fs::{DirEntry, create_dir};
 use std::io;
 
+use crate::lists::mk8d;
+
 #[derive(Debug, Clone, ValueEnum)]
 enum Mode {
     REPL,
@@ -42,10 +44,12 @@ fn main() -> io::Result<()> {
         create_dir(&saves_dir)?;
     }
 
-    let saves: Vec<DirEntry> = std::fs::read_dir(saves_dir)?.collect::<Result<Vec<_>, _>>()?;
+    let saves: Vec<DirEntry> = std::fs::read_dir(&saves_dir)?.collect::<Result<Vec<_>, _>>()?;
 
     if saves.is_empty() {
-        println!("No saves found. Consider creating one.");
+        println!("No saves found. Creating a default (mk8d), will add more later, maybe");
+        let course_list = mk8d::make_mk8d(saves_dir);
+        course_list.dump_list()?;
         return Ok(());
     }
 

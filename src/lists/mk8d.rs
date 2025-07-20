@@ -1,9 +1,9 @@
-use crate::courses::course::Course;
+use crate::courses::{course::Course, course_list::CourseList};
 
-use std::collections::BTreeSet;
+use std::{collections::BTreeSet, path::PathBuf};
 
-pub fn make_mk8d() -> BTreeSet<Course> {
-    BTreeSet::from([
+pub fn make_mk8d(mut saves_dir: PathBuf) -> CourseList {
+    let list = BTreeSet::from([
         Course::new(1, 314, "Wii  Coconut Mall"),
         Course::new(2, 354, "Wii  Maple Treeway"),
         Course::new(3, 211, "Wii  Moo Moo Meadows"),
@@ -100,5 +100,8 @@ pub fn make_mk8d() -> BTreeSet<Course> {
         Course::new(94, 341, "Tour Sydney Sprint"),
         Course::new(95, 321, "Tour Tokyo Blur"),
         Course::new(96, 162, "GBA  Cheese Land"),
-    ])
+    ]);
+
+    saves_dir.push("mk8d.json");
+    CourseList::new_with_list(saves_dir, list)
 }
