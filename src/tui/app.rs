@@ -1,4 +1,4 @@
-use crate::courses::course_list::CourseList;
+use std::{io, path::PathBuf};
 
 use ratatui::{
     DefaultTerminal, Frame,
@@ -9,17 +9,17 @@ use ratatui::{
     widgets::Widget,
 };
 
-use std::{io, path::PathBuf};
+use crate::courses::course_list::CourseList;
 
 #[derive(Debug)]
 pub enum CurrentScreen {
-    Load,           // Loading screen
-    Current,        // Displays courses in current
-    Removed,        // Displays courses in removed
-    SearchCurrent,  // Filter current
-    SearchRemoved,  // Filter removed
-    Tiered,         // Tiered sublist
-    Quitting,       // Quit confirmation screen
+    Load,          // Loading screen
+    Current,       // Displays courses in current
+    Removed,       // Displays courses in removed
+    SearchCurrent, // Filter current
+    SearchRemoved, // Filter removed
+    Tiered,        // Tiered sublist
+    Quitting,      // Quit confirmation screen
 }
 
 #[derive(Debug)]

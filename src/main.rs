@@ -1,20 +1,18 @@
-mod app;
 mod courses;
 mod lists;
 mod repl;
-mod ui;
+mod tui;
 
-use app::TUI;
-use repl::repl;
+use std::fs::{DirEntry, create_dir};
+use std::io;
 
 use clap::ValueEnum;
 use clap::{self, Parser};
 use dirs;
 
-use std::fs::{DirEntry, create_dir};
-use std::io;
-
-use crate::lists::mk8d;
+use tui::app::TUI;
+use lists::mk8d;
+use repl::repl;
 
 #[derive(Debug, Clone, ValueEnum)]
 enum Mode {

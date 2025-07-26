@@ -1,6 +1,8 @@
-use super::course::Course;
-use serde::{Deserialize, Serialize};
 use std::fmt;
+
+use serde::{Deserialize, Serialize};
+
+use super::course::Course;
 
 // An action the user takes, e.g. adding or removing a course
 #[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
@@ -47,10 +49,6 @@ impl History {
         let res = self.future.pop()?;
         self.past.push(res.clone());
         Some(res)
-    }
-
-    pub fn has_history(&self) -> bool {
-        return !self.past.is_empty();
     }
 
     pub fn reset(&mut self) {
@@ -105,15 +103,6 @@ mod tests {
         assert_eq!(hist.past.len(), 1);
         hist.push(Action::Add(Course::new(2, 112, "Two")));
         assert_eq!(hist.past.len(), 2);
-    }
-
-    #[test]
-    fn test_has_history() {
-        let mut hist = History::new();
-        assert!(!hist.has_history());
-        hist.push(Action::Add(Course::new(1, 111, "One")));
-        hist.push(Action::Add(Course::new(2, 112, "Two")));
-        assert!(hist.has_history());
     }
 
     // The remaining method functionalities are fairly intertwined, so we test them all at once

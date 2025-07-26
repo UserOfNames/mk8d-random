@@ -1,15 +1,15 @@
-use super::course::Course;
-use super::history::Action;
-use super::history::History;
+use std::collections::BTreeSet;
+use std::fs::{self, File, create_dir_all};
+use std::io::{self, Write};
+use std::path::PathBuf;
 
 use rand::seq::IndexedRandom;
 use rand::{self, Rng};
 use serde::{Deserialize, Serialize};
 
-use std::collections::BTreeSet;
-use std::fs::{self, File, create_dir_all};
-use std::io::{self, Write};
-use std::path::PathBuf;
+use super::course::Course;
+use super::history::Action;
+use super::history::History;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseList {
@@ -76,18 +76,18 @@ impl CourseList {
         self.removed.insert(course);
     }
 
-    pub fn search_current(&self, searched: &str) -> BTreeSet<&Course> {
+    pub fn search_current(&self, searched: &str) -> impl Iterator<Item = &Course> {
+        let key = searched.to_lowercase();
         self.current
             .iter()
-            .filter(|c| c.name.to_lowercase().contains(&searched.to_lowercase()))
-            .collect()
+            .filter(move |c| c.name.to_lowercase().contains(&key))
     }
 
-    pub fn search_removed(&self, searched: &str) -> BTreeSet<&Course> {
+    pub fn search_removed(&self, searched: &str) -> impl Iterator<Item = &Course> {
+        let key = searched.to_lowercase();
         self.removed
             .iter()
-            .filter(|c| c.name.to_lowercase().contains(&searched.to_lowercase()))
-            .collect()
+            .filter(move |c| c.name.to_lowercase().contains(&key))
     }
 
     pub fn get_random(&self) -> Option<&Course> {
@@ -175,7 +175,6 @@ mod tests {
         let course_list = CourseList::new(&file_path);
         assert!(course_list.current.is_empty());
         assert_eq!(course_list.file, file_path);
-        assert!(!course_list.history.has_history());
     }
 
     #[test]
@@ -276,16 +275,16 @@ mod tests {
         course_list.add(course4.clone());
         course_list.remove(course4);
 
-        let mut current = course_list.search_current("t").into_iter();
-        let mut removed = course_list.search_removed("f").into_iter();
+        let mut current = course_list.search_current("t");
+        let mut removed = course_list.search_removed("f");
 
-        assert_eq!(current.len(), 2);
         assert_eq!(current.next().unwrap().name, "Two");
         assert_eq!(current.next().unwrap().name, "Three");
+        assert!(current.next().is_none());
         assert_eq!(removed.next().unwrap().name, "Four");
 
-        let empty_results = course_list.search_current("A");
-        assert!(empty_results.is_empty());
+        let mut empty_results = course_list.search_current("A");
+        assert!(empty_results.next().is_none());
     }
 
     #[test]
@@ -333,27 +332,6 @@ mod tests {
 
         course_list.roll_forward().unwrap();
         assert_eq!(course_list.current.len(), 1);
-    }
-
-    #[test]
-    fn test_get_history() {
-        let file_path = tempdir().unwrap().path().join("test.json");
-        let mut course_list = CourseList::new(&file_path);
-
-        let mut hist = course_list.get_history();
-        assert!(!hist.has_history());
-
-        let course1 = Course::new(1, 101, "One");
-        let course2 = Course::new(2, 102, "Two");
-        let course3 = Course::new(3, 103, "Three");
-
-        course_list.add(course1.clone());
-        course_list.add(course2.clone());
-        course_list.add(course3.clone());
-        course_list.remove(course2.clone());
-
-        hist = course_list.get_history();
-        assert!(hist.has_history());
     }
 
     #[test]

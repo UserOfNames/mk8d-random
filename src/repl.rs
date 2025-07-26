@@ -1,16 +1,16 @@
 use std::fs::DirEntry;
 use std::io;
 
+use my_lib::continue_on_err;
+use my_lib::io::input::get_input;
+use rand::Rng;
+
 use crate::courses::course::Course;
 use crate::courses::course_list::CourseList;
 
-use mk8d_random::continue_on_err;
-use mk8d_random::utils::get_input;
-use rand::Rng;
-
 pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
     let mut input: String; // Used for all user input
-    let mut index: usize;  // Used for all indexes
+    let mut index: usize; // Used for all indexes
 
     println!("Enter the number of the save you want to use:");
     for (i, de) in saves.iter().enumerate() {
@@ -196,7 +196,10 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
             }
 
             "tier" => {
-                input = continue_on_err!(get_input("Enter the size of the prix: "), "Error reading input");
+                input = continue_on_err!(
+                    get_input("Enter the size of the prix: "),
+                    "Error reading input"
+                );
                 let size: usize = continue_on_err!(input.parse());
 
                 let tiered_courses = match course_list.get_random_by_chunks(size) {
@@ -261,14 +264,12 @@ fn help() {
 
 fn run_tiered_list(mut list: Vec<Course>) -> bool {
     let mut rng = rand::rng();
-    println!(
-        "Entered tiered list. Type 'back' to return without removing the selected courses."
-    );
+    println!("Entered tiered list. Type 'back' to return without removing the selected courses.");
 
     let mut input: String;
     while !list.is_empty() {
         input = continue_on_err!(get_input(":> "), "Error reading input");
-        
+
         match input.trim().to_lowercase().as_ref() {
             "" => {
                 let index = rng.random_range(0..list.len());

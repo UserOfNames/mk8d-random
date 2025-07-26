@@ -1,6 +1,9 @@
-use ratatui::{layout::{Constraint, Direction, Layout, Rect}, Frame};
+use ratatui::{
+    Frame,
+    layout::{Constraint, Direction, Layout, Rect},
+};
 
-use crate::app::TUI;
+use super::app::TUI;
 
 impl TUI {
     pub fn draw(&self, frame: &mut Frame) {}
