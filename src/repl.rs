@@ -1,54 +1,47 @@
 use std::fs::DirEntry;
-use std::io;
+use std::path::PathBuf;
 
+use anyhow::{self, Context};
 use my_lib::continue_on_err;
-use my_lib::io::input::get_input;
+use my_lib::io::input::update_input;
 use rand::Rng;
 
 use crate::courses::course::Course;
 use crate::courses::course_list::CourseList;
+use crate::lists::mk8d;
 
-pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
-    let mut input: String; // Used for all user input
+pub fn run_repl(saves: Vec<DirEntry>, saves_dir: PathBuf) -> anyhow::Result<()> {
+    let mut input: String = String::new(); // Used for all user input
     let mut index: usize; // Used for all indexes
 
-    println!("Enter the number of the save you want to use:");
-    for (i, de) in saves.iter().enumerate() {
-        println!("{}: {:?}", i, de.file_name());
+    if saves.is_empty() {
+        println!("No saves found. Creating a default (mk8d), will add more later, maybe");
+        let course_list = mk8d::make_mk8d(saves_dir);
+        course_list.dump_list()?;
+        return Ok(());
     }
-    input = get_input(":> ")?;
 
-    index = match input.trim().parse() {
-        Ok(i) => i,
-        Err(e) => {
-            eprintln!("Error parsing input: {}", e);
-            // TODO: Handle this error
-            return Ok(());
-        }
-    };
+    println!("Enter the number of the save you want to use:");
+    for (i, dir_entry) in saves.iter().enumerate() {
+        println!("{}: {:?}", i, dir_entry.file_name());
+    }
+    update_input(&mut input, ":> ")?;
 
-    let selection = match saves.get(index) {
-        Some(s) => s,
-        None => {
-            eprintln!("Error selecting list: Out of range selection");
-            // TODO: Handle this error
-            return Ok(());
-        }
-    };
+    index = input
+        .trim()
+        .parse()
+        .context(format!("Parsing input {} into number", input))?;
+
+    let selection = saves
+        .get(index)
+        .ok_or(anyhow::anyhow!("Out of range selection: {}", index))?;
 
     let mut course_list = CourseList::new(selection.path());
-    match course_list.restore_list() {
-        Ok(()) => {}
-        Err(e) => {
-            eprintln!("Error while loading the saved course list: {}", e);
-            // TODO: Handle this error
-            return Ok(());
-        }
-    }
+    course_list.restore_list().context("Loading the saved course list")?;
 
     println!("\nEnter 'help' for help information.");
     loop {
-        input = continue_on_err!(get_input(":> "), "Error reading input");
+        continue_on_err!(update_input(&mut input, ":> "), "Error reading input");
 
         match input.trim().to_lowercase().as_ref() {
             "" => {
@@ -64,7 +57,7 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
 
             "q" | "quit" => {
                 println!("Save changes before quitting? (Y/N): ");
-                input = continue_on_err!(get_input(":> "), "Error reading input");
+                continue_on_err!(update_input(&mut input, ":> "), "Error reading input");
                 match input.trim().to_lowercase().as_ref() {
                     "y" => {
                         continue_on_err!(course_list.dump_list(), "Error saving list");
@@ -117,8 +110,8 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
             "history" => println!("{}", course_list.get_history()),
 
             "reset" => {
-                input = continue_on_err!(
-                    get_input("Are you sure? ('Y' to confirm): "),
+                continue_on_err!(
+                    update_input(&mut input, "Are you sure? ('Y' to confirm): "),
                     "Error reading input"
                 );
 
@@ -148,7 +141,10 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
             }
 
             "add" => {
-                input = continue_on_err!(get_input("Search courses: "), "Error reading input");
+                continue_on_err!(
+                    update_input(&mut input, "Search courses: "),
+                    "Error reading input"
+                );
 
                 let mut results: Vec<&Course> =
                     course_list.search_removed(&input).into_iter().collect();
@@ -158,8 +154,8 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
                     println!("{}: {}", i + 1, c);
                 }
 
-                input = continue_on_err!(
-                    get_input("Select the number of the course to add: "),
+                continue_on_err!(
+                    update_input(&mut input, "Select the number of the course to add: "),
                     "Error reading input"
                 );
                 index = continue_on_err!(input.parse(), "Error parsing number");
@@ -172,7 +168,10 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
             }
 
             "remove" | "rm" | "pop" => {
-                input = continue_on_err!(get_input("Search courses: "), "Error reading input");
+                continue_on_err!(
+                    update_input(&mut input, "Search courses: "),
+                    "Error reading input"
+                );
 
                 let mut results: Vec<&Course> =
                     course_list.search_current(&input).into_iter().collect();
@@ -182,8 +181,8 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
                     println!("{}: {}", i + 1, c);
                 }
 
-                input = continue_on_err!(
-                    get_input("Select the number of the course to remove: "),
+                continue_on_err!(
+                    update_input(&mut input, "Select the number of the course to remove: "),
                     "Error reading input"
                 );
                 index = continue_on_err!(input.parse(), "Error parsing number");
@@ -196,14 +195,14 @@ pub fn repl(saves: Vec<DirEntry>) -> io::Result<()> {
             }
 
             "tier" => {
-                input = continue_on_err!(
-                    get_input("Enter the size of the prix: "),
+                continue_on_err!(
+                    update_input(&mut input, "Enter the size of the prix: "),
                     "Error reading input"
                 );
                 let size: usize = continue_on_err!(input.parse());
 
-                let tiered_courses = match course_list.get_random_by_chunks(size) {
-                    Ok(c) => c,
+                let tiered_courses: Vec<Course> = match course_list.get_random_by_chunks(size) {
+                    Ok(c) => c.collect(),
                     Err(_) => {
                         eprintln!(
                             "Error: Could not divide courses into tiers.\n\
@@ -266,9 +265,9 @@ fn run_tiered_list(mut list: Vec<Course>) -> bool {
     let mut rng = rand::rng();
     println!("Entered tiered list. Type 'back' to return without removing the selected courses.");
 
-    let mut input: String;
+    let mut input: String = String::new();
     while !list.is_empty() {
-        input = continue_on_err!(get_input(":> "), "Error reading input");
+        continue_on_err!(update_input(&mut input, ":> "), "Error reading input");
 
         match input.trim().to_lowercase().as_ref() {
             "" => {

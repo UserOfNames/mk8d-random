@@ -4,37 +4,34 @@ mod repl;
 mod tui;
 
 use std::fs::{DirEntry, create_dir};
-use std::io;
 
+use anyhow::{self, bail};
 use clap::ValueEnum;
 use clap::{self, Parser};
 use dirs;
 
+use repl::run_repl;
+
 use tui::app::TUI;
-use lists::mk8d;
-use repl::repl;
 
 #[derive(Debug, Clone, ValueEnum)]
 enum Mode {
-    REPL,
-    TUI,
+    Repl,
+    Tui,
 }
 
 #[derive(Debug, Parser)]
 #[command(name = "mk8d-random", author = "UserOfNames", version, about)]
 struct Args {
-    #[arg(short, value_enum, default_value_t = Mode::REPL, help = "Mode for the UI")]
+    #[arg(short, value_enum, default_value_t = Mode::Repl, help = "Mode for the UI")]
     mode: Mode,
 }
 
-fn main() -> io::Result<()> {
+fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
     let Some(mut saves_dir) = dirs::data_dir() else {
-        return Err(io::Error::new(
-            io::ErrorKind::NotFound,
-            "Could not find data directory",
-        ));
+        bail!("Could not find data directory");
     };
 
     saves_dir.push("mk8d-random");
@@ -42,23 +39,16 @@ fn main() -> io::Result<()> {
         create_dir(&saves_dir)?;
     }
 
-    let saves: Vec<DirEntry> = std::fs::read_dir(&saves_dir)?.collect::<Result<Vec<_>, _>>()?;
-
-    if saves.is_empty() {
-        println!("No saves found. Creating a default (mk8d), will add more later, maybe");
-        let course_list = mk8d::make_mk8d(saves_dir);
-        course_list.dump_list()?;
-        return Ok(());
-    }
+    let saves: Vec<DirEntry> = std::fs::read_dir(&saves_dir)?.collect::<Result<_, _>>()?;
 
     match args.mode {
-        Mode::TUI => {
+        Mode::Tui => {
             let mut terminal = ratatui::init();
             let app_result = TUI::new().run(&mut terminal);
             ratatui::restore();
-            app_result
+            Ok(app_result?)
         }
 
-        Mode::REPL => repl(saves),
+        Mode::Repl => Ok(run_repl(saves, saves_dir)?),
     }
 }

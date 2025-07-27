@@ -99,8 +99,8 @@ impl CourseList {
         self.current.iter().nth(index)
     }
 
-    pub fn get_random_by_chunks(&self, num_chunks: usize) -> Result<Vec<Course>, ()> {
-        let curr_vec: Vec<Course> = self.current.iter().cloned().collect();
+    pub fn get_random_by_chunks(&self, num_chunks: usize) -> Result<impl Iterator<Item = Course>, ()> {
+        let curr_vec: Vec<&Course> = self.current.iter().collect();
         let len = self.current.len();
 
         if len % num_chunks != 0 {
@@ -113,11 +113,11 @@ impl CourseList {
 
         for chunk in curr_vec.chunks_exact(chunk_size) {
             // We already validated the chunks, so unwrap() is fine here
-            let selection = chunk.choose(&mut rng).unwrap();
+            let selection = *chunk.choose(&mut rng).unwrap();
             res.push(selection.clone());
         }
 
-        Ok(res)
+        Ok(res.into_iter())
     }
 
     pub fn reset(&mut self) {
