@@ -44,7 +44,7 @@ impl Repl {
         Ok(Self {
             course_list: CourseList::restore_save(selection.path())
                 .context("Loading the saved course list")?,
-            input: String::new(),
+            input,
         })
     }
 
@@ -80,7 +80,7 @@ impl Repl {
 
                 "add" => continue_on_err!(self.add()),
 
-                "remove" => continue_on_err!(self.remove()),
+                "remove" | "rm" | "pop" => continue_on_err!(self.remove()),
 
                 "tier" => continue_on_err!(self.tier()),
 
@@ -187,55 +187,40 @@ impl Repl {
 
     fn add(&mut self) -> anyhow::Result<()> {
         update_input(&mut self.input, "Search courses: ").context("Reading input")?;
-
         let results: Vec<&Course> = self.course_list.search_removed(&self.input).collect();
 
-        for (i, c) in results.iter().enumerate() {
-            println!("{}: {}", i + 1, c);
-        }
-
-        update_input(&mut self.input, "Select the number of the course to add: ")
-            .context("Reading input")?;
-
-        let index: usize = self
-            .input
-            .parse()
-            .context(format!("Parsing input '{}' into number", self.input))?;
-
-        let &selection = results
-            .get(index.wrapping_sub(1))
-            .ok_or(anyhow::anyhow!("Selecting course: Out of bounds selection"))?;
-
-        self.course_list.add(selection.clone());
+        let selection = Self::search(&mut self.input, results)?;
+        self.course_list.add(selection);
         Ok(())
     }
 
     fn remove(&mut self) -> anyhow::Result<()> {
         update_input(&mut self.input, "Search courses: ").context("Reading input")?;
-
         let results: Vec<&Course> = self.course_list.search_current(&self.input).collect();
 
-        for (i, c) in results.iter().enumerate() {
+        let selection = Self::search(&mut self.input, results)?;
+        self.course_list.remove(selection);
+        Ok(())
+    }
+
+    // This is a rather unfortunate partial borrowing hack to get around a mutable borrow issue
+    // I decided that avoiding new allocations was preferable to removing this hack
+    fn search(input: &mut String, sub_list: Vec<&Course>) -> anyhow::Result<Course> {
+        for (i, c) in sub_list.iter().enumerate() {
             println!("{}: {}", i + 1, c);
         }
 
-        update_input(
-            &mut self.input,
-            "Select the number of the course to remove: ",
-        )
-        .context("Reading input")?;
+        update_input(input, "Select a number: ").context("Reading input")?;
 
-        let index: usize = self
-            .input
+        let index: usize = input
             .parse()
-            .context(format!("Parsing input '{}' into number", self.input))?;
+            .context(format!("Parsing input '{}' into number", input))?;
 
-        let &selection = results
+        let &selection = sub_list
             .get(index.wrapping_sub(1))
             .ok_or(anyhow::anyhow!("Selecting course: Out of bounds selection"))?;
 
-        self.course_list.remove(selection.clone());
-        Ok(())
+        Ok(selection.clone())
     }
 
     fn tier(&mut self) -> anyhow::Result<()> {
