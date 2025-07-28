@@ -3,9 +3,9 @@ use ratatui::{
     layout::{Constraint, Direction, Layout, Rect},
 };
 
-use super::app::TUI;
+use super::tui::Tui;
 
-impl TUI {
+impl Tui {
     pub fn draw(&self, frame: &mut Frame) {}
 }
 

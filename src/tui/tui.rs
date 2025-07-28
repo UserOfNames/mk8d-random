@@ -23,15 +23,15 @@ pub enum CurrentScreen {
 }
 
 #[derive(Debug)]
-pub struct TUI {
+pub struct Tui {
     pub current_screen: CurrentScreen,
     pub course_list: CourseList,
     quit: bool,
 }
 
-impl TUI {
+impl Tui {
     pub fn new() -> Self {
-        TUI {
+        Tui {
             course_list: CourseList::new(""),
             current_screen: CurrentScreen::Load,
             quit: false,

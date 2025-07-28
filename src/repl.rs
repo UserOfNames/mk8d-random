@@ -8,257 +8,296 @@ use rand::Rng;
 
 use crate::courses::course::Course;
 use crate::courses::course_list::CourseList;
-use crate::lists::mk8d;
+use crate::templates::mk8d;
 
-pub fn run_repl(saves: Vec<DirEntry>, saves_dir: PathBuf) -> anyhow::Result<()> {
-    let mut input: String = String::new(); // Used for all user input
-    let mut index: usize; // Used for all indexes
+pub struct Repl {
+    course_list: CourseList,
+    input: String,
+}
 
-    if saves.is_empty() {
-        println!("No saves found. Creating a default (mk8d), will add more later, maybe");
-        let course_list = mk8d::make_mk8d(saves_dir);
-        course_list.dump_list()?;
-        return Ok(());
+impl Repl {
+    pub fn new(saves: Vec<DirEntry>, saves_dir: impl Into<PathBuf>) -> anyhow::Result<Self> {
+        let mut input: String = String::new();
+
+        if saves.is_empty() {
+            println!("No saves found. Creating a default (mk8d), will add more later, maybe");
+            let course_list = mk8d::make_mk8d(saves_dir.into());
+            course_list.dump_list()?;
+            return Err(anyhow::anyhow!("Loading course list"));
+        }
+
+        println!("Enter the number of the save you want to use:");
+        for (i, dir_entry) in saves.iter().enumerate() {
+            println!("{}: {:?}", i, dir_entry.file_name());
+        }
+        update_input(&mut input, ":> ")?;
+
+        let index: usize = input
+            .trim()
+            .parse()
+            .context(format!("Parsing input '{}' into number", input))?;
+
+        let selection = saves
+            .get(index)
+            .ok_or(anyhow::anyhow!("Out of range selection: {}", index))?;
+
+        Ok(Self {
+            course_list: CourseList::restore_save(selection.path())
+                .context("Loading the saved course list")?,
+            input: String::new(),
+        })
     }
 
-    println!("Enter the number of the save you want to use:");
-    for (i, dir_entry) in saves.iter().enumerate() {
-        println!("{}: {:?}", i, dir_entry.file_name());
-    }
-    update_input(&mut input, ":> ")?;
+    pub fn run(&mut self) -> anyhow::Result<()> {
+        println!("Running. Enter 'help' for help information.");
+        loop {
+            continue_on_err!(update_input(&mut self.input, ":> "), "Error reading input");
 
-    index = input
-        .trim()
-        .parse()
-        .context(format!("Parsing input {} into number", input))?;
+            match self.input.trim().to_lowercase().as_ref() {
+                "" => self.generate(),
 
-    let selection = saves
-        .get(index)
-        .ok_or(anyhow::anyhow!("Out of range selection: {}", index))?;
-
-    let mut course_list = CourseList::new(selection.path());
-    course_list.restore_list().context("Loading the saved course list")?;
-
-    println!("\nEnter 'help' for help information.");
-    loop {
-        continue_on_err!(update_input(&mut input, ":> "), "Error reading input");
-
-        match input.trim().to_lowercase().as_ref() {
-            "" => {
-                let Some(course) = course_list.get_random() else {
-                    println!("The course list is empty. Resetting.");
-                    course_list.reset();
-                    continue;
-                };
-
-                println!("{}", course);
-                course_list.remove(course.clone());
-            }
-
-            "q" | "quit" => {
-                println!("Save changes before quitting? (Y/N): ");
-                continue_on_err!(update_input(&mut input, ":> "), "Error reading input");
-                match input.trim().to_lowercase().as_ref() {
-                    "y" => {
-                        continue_on_err!(course_list.dump_list(), "Error saving list");
-                        println!("Saved successfully.");
-                    }
-
-                    "n" => {}
-
-                    _ => {
-                        println!("Please select Y/N.");
-                        continue;
-                    }
+                "q" | "quit" => {
+                    continue_on_err!(self.quit());
+                    println!("Quitting...");
+                    break;
                 }
 
-                println!("Quitting...");
-                break;
+                "help" => self.help(),
+
+                "save" => continue_on_err!(self.save()),
+
+                "remaining" | "re" | "ls" => self.remaining(),
+
+                "used" => self.used(),
+
+                "history" => self.history(),
+
+                "reset" => continue_on_err!(self.reset()),
+
+                "back" => self.back(),
+
+                "forward" => self.forward(),
+
+                "add" => continue_on_err!(self.add()),
+
+                "remove" => continue_on_err!(self.remove()),
+
+                "tier" => continue_on_err!(self.tier()),
+
+                _ => eprintln!("Unrecognized command."),
             }
+        }
 
-            "help" => help(),
+        Ok(())
+    }
 
-            "save" => {
-                continue_on_err!(course_list.dump_list(), "Error saving list");
+    fn generate(&mut self) {
+        let Some(course) = self.course_list.get_random() else {
+            println!("The course list is empty. Resetting.");
+            self.course_list.reset();
+            return;
+        };
+
+        println!("{}", course);
+        self.course_list.remove(course.clone());
+    }
+
+    fn quit(&mut self) -> anyhow::Result<()> {
+        println!("Save changes before quitting? (Y/N): ");
+        update_input(&mut self.input, ":> ").context("Reading input")?;
+        match self.input.trim().to_lowercase().as_ref() {
+            "y" => {
+                self.course_list.dump_list().context("Saving list")?;
                 println!("Saved successfully.");
             }
 
-            "remaining" | "re" | "ls" => {
-                let current = course_list.get_current();
-                if current.is_empty() {
-                    println!("Course list is empty.");
-                    continue;
-                }
+            "n" => {}
 
-                let strings: Vec<String> = current.iter().map(|c| c.to_string()).collect();
-                println!("{}", strings.join("\n"));
-                println!("There are {} courses in the list.", current.len())
+            _ => {
+                return Err(anyhow::anyhow!("Must select Y or N"));
+            }
+        }
+
+        Ok(())
+    }
+
+    fn save(&self) -> anyhow::Result<()> {
+        self.course_list.dump_list().context("Saving list")?;
+        println!("Saved successfully.");
+        Ok(())
+    }
+
+    fn remaining(&self) {
+        let current = self.course_list.get_current();
+        if current.is_empty() {
+            println!("The course list is empty.");
+            return;
+        }
+
+        let strings: Vec<String> = current.iter().map(|c| c.to_string()).collect();
+        println!("{}", strings.join("\n"));
+        println!("There are {} courses in the list.", current.len())
+    }
+
+    fn used(&self) {
+        let removed = self.course_list.get_removed();
+        if removed.is_empty() {
+            println!("No courses have been used.");
+            return;
+        }
+
+        let strings: Vec<String> = removed.iter().map(|c| c.to_string()).collect();
+        println!("{}", strings.join("\n"));
+        println!("{} courses have been used.", removed.len())
+    }
+
+    fn history(&self) {
+        println!("{}", self.course_list.get_history());
+    }
+
+    fn reset(&mut self) -> anyhow::Result<()> {
+        update_input(&mut self.input, "Are you sure? (capital 'Y' to confirm): ")
+            .context("Reading input")?;
+
+        match self.input.trim() {
+            "Y" => {
+                self.course_list.reset();
+                println!("Course list reset.");
             }
 
-            "used" => {
-                let removed = course_list.get_removed();
-                if removed.is_empty() {
-                    println!("No courses have been used.");
-                    continue;
-                }
-
-                let strings: Vec<String> = removed.iter().map(|c| c.to_string()).collect();
-                println!("{}", strings.join("\n"));
-                println!("{} courses have been used.", removed.len())
+            _ => {
+                println!("Cancelled reset.");
             }
+        }
 
-            "history" => println!("{}", course_list.get_history()),
+        Ok(())
+    }
 
-            "reset" => {
-                continue_on_err!(
-                    update_input(&mut input, "Are you sure? ('Y' to confirm): "),
-                    "Error reading input"
-                );
-
-                match input.trim() {
-                    "Y" => {
-                        course_list.reset();
-                        println!("Course list reset.");
-                    }
-
-                    _ => {
-                        println!("Cancelled reset.");
-                        continue;
-                    }
-                }
-            }
-
-            "back" => {
-                if course_list.roll_back().is_err() {
-                    eprintln!("Error rolling back: No history found");
-                }
-            }
-
-            "forward" => {
-                if course_list.roll_forward().is_err() {
-                    eprintln!("Error rolling forward: No future found");
-                }
-            }
-
-            "add" => {
-                continue_on_err!(
-                    update_input(&mut input, "Search courses: "),
-                    "Error reading input"
-                );
-
-                let mut results: Vec<&Course> =
-                    course_list.search_removed(&input).into_iter().collect();
-                results.sort();
-
-                for (i, c) in results.iter().enumerate() {
-                    println!("{}: {}", i + 1, c);
-                }
-
-                continue_on_err!(
-                    update_input(&mut input, "Select the number of the course to add: "),
-                    "Error reading input"
-                );
-                index = continue_on_err!(input.parse(), "Error parsing number");
-                let Some(&selection) = results.get(index.wrapping_sub(1)) else {
-                    eprintln!("Error selecting course: Out of bounds selection");
-                    continue;
-                };
-
-                course_list.add(selection.clone());
-            }
-
-            "remove" | "rm" | "pop" => {
-                continue_on_err!(
-                    update_input(&mut input, "Search courses: "),
-                    "Error reading input"
-                );
-
-                let mut results: Vec<&Course> =
-                    course_list.search_current(&input).into_iter().collect();
-                results.sort();
-
-                for (i, c) in results.iter().enumerate() {
-                    println!("{}: {}", i + 1, c);
-                }
-
-                continue_on_err!(
-                    update_input(&mut input, "Select the number of the course to remove: "),
-                    "Error reading input"
-                );
-                index = continue_on_err!(input.parse(), "Error parsing number");
-                let Some(&selection) = results.get(index.wrapping_sub(1)) else {
-                    eprintln!("Error selecting course: Out of bounds selection");
-                    continue;
-                };
-
-                course_list.remove(selection.clone());
-            }
-
-            "tier" => {
-                continue_on_err!(
-                    update_input(&mut input, "Enter the size of the prix: "),
-                    "Error reading input"
-                );
-                let size: usize = continue_on_err!(input.parse());
-
-                let tiered_courses: Vec<Course> = match course_list.get_random_by_chunks(size) {
-                    Ok(c) => c.collect(),
-                    Err(_) => {
-                        eprintln!(
-                            "Error: Could not divide courses into tiers.\n\
-                            This probably means the course list cannot be evenly divided by the given prix size.\n\
-                            Consider adding or removing courses until the list is evenly divisible."
-                        );
-                        continue;
-                    }
-                };
-
-                if run_tiered_list(tiered_courses.clone()) {
-                    for course in tiered_courses {
-                        course_list.remove(course);
-                    }
-                }
-            }
-
-            _ => println!("Unrecognized command."),
+    fn back(&mut self) {
+        if self.course_list.roll_back().is_err() {
+            eprintln!("Error rolling back: No history found");
         }
     }
 
-    Ok(())
-}
+    fn forward(&mut self) {
+        if self.course_list.roll_forward().is_err() {
+            eprintln!("Error rolling forward: No future found");
+        }
+    }
 
-fn help() {
-    println!("---------------------------------------------------");
+    fn add(&mut self) -> anyhow::Result<()> {
+        update_input(&mut self.input, "Search courses: ").context("Reading input")?;
 
-    println!(
-        "Blank input: Generate and remove a random course.\n\
-        q, quit:      Exit.\n\
-        help:         Show this help text.\n\
-        save:         Save the list."
-    );
+        let results: Vec<&Course> = self.course_list.search_removed(&self.input).collect();
 
-    println!(
-        "Information:\n\
-        remaining, re, ls: List remaining courses.\n\
-        used:              List used courses.\n\
-        history:           Show history.\n"
-    );
+        for (i, c) in results.iter().enumerate() {
+            println!("{}: {}", i + 1, c);
+        }
 
-    println!(
-        "List editing:\n\
-        reset:           Reset the course list and delete all history.\n\
-        back:            Roll back in history.\n\
-        forward:         Roll forward in history.\n\
-        add:             Add a previously removed course.\n\
-        remove, rm, pop: Remove a currently active course.\n"
-    );
+        update_input(&mut self.input, "Select the number of the course to add: ")
+            .context("Reading input")?;
 
-    println!(
-        "Special:\n\
-        tier: Generate a tiered sub-list."
-    );
+        let index: usize = self
+            .input
+            .parse()
+            .context(format!("Parsing input '{}' into number", self.input))?;
 
-    println!("---------------------------------------------------");
+        let &selection = results
+            .get(index.wrapping_sub(1))
+            .ok_or(anyhow::anyhow!("Selecting course: Out of bounds selection"))?;
+
+        self.course_list.add(selection.clone());
+        Ok(())
+    }
+
+    fn remove(&mut self) -> anyhow::Result<()> {
+        update_input(&mut self.input, "Search courses: ").context("Reading input")?;
+
+        let results: Vec<&Course> = self.course_list.search_current(&self.input).collect();
+
+        for (i, c) in results.iter().enumerate() {
+            println!("{}: {}", i + 1, c);
+        }
+
+        update_input(
+            &mut self.input,
+            "Select the number of the course to remove: ",
+        )
+        .context("Reading input")?;
+
+        let index: usize = self
+            .input
+            .parse()
+            .context(format!("Parsing input '{}' into number", self.input))?;
+
+        let &selection = results
+            .get(index.wrapping_sub(1))
+            .ok_or(anyhow::anyhow!("Selecting course: Out of bounds selection"))?;
+
+        self.course_list.remove(selection.clone());
+        Ok(())
+    }
+
+    fn tier(&mut self) -> anyhow::Result<()> {
+        update_input(&mut self.input, "Enter the size of the prix: ").context("Reading input")?;
+        let size: usize = self
+            .input
+            .parse()
+            .context(format!("Parsing input '{}' into number", self.input))?;
+
+        let tiered_courses: Vec<Course> = match self.course_list.get_random_by_chunks(size) {
+            Ok(c) => c.collect(),
+            Err(_) => {
+                return Err(anyhow::anyhow!(
+                    "Error: Could not divide courses into tiers.\n\
+                    This probably means the course list cannot be evenly divided by the given prix size.\n\
+                    Consider adding or removing courses until the list is evenly divisible."
+                ));
+            }
+        };
+
+        if run_tiered_list(tiered_courses.clone()) {
+            for course in tiered_courses {
+                self.course_list.remove(course);
+            }
+        }
+
+        Ok(())
+    }
+
+    fn help(&self) {
+        println!("---------------------------------------------------");
+
+        println!(
+            "Blank input: Generate and remove a random course.\n\
+            q, quit:      Exit.\n\
+            help:         Show this help text.\n\
+            save:         Save the list."
+        );
+
+        println!(
+            "Information:\n\
+            remaining, re, ls: List remaining courses.\n\
+            used:              List used courses.\n\
+            history:           Show history.\n"
+        );
+
+        println!(
+            "List editing:\n\
+            reset:           Reset the course list and delete all history.\n\
+            back:            Roll back in history.\n\
+            forward:         Roll forward in history.\n\
+            add:             Add a previously removed course.\n\
+            remove, rm, pop: Remove a currently active course.\n"
+        );
+
+        println!(
+            "Special:\n\
+            tier: Generate a tiered sub-list."
+        );
+
+        println!("---------------------------------------------------");
+    }
 }
 
 fn run_tiered_list(mut list: Vec<Course>) -> bool {

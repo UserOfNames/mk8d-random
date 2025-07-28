@@ -1,5 +1,5 @@
 mod courses;
-mod lists;
+mod templates;
 mod repl;
 mod tui;
 
@@ -10,9 +10,9 @@ use clap::ValueEnum;
 use clap::{self, Parser};
 use dirs;
 
-use repl::run_repl;
+use repl::Repl;
 
-use tui::app::TUI;
+use tui::tui::Tui;
 
 #[derive(Debug, Clone, ValueEnum)]
 enum Mode {
@@ -44,11 +44,14 @@ fn main() -> anyhow::Result<()> {
     match args.mode {
         Mode::Tui => {
             let mut terminal = ratatui::init();
-            let app_result = TUI::new().run(&mut terminal);
+            let app_result = Tui::new().run(&mut terminal);
             ratatui::restore();
             Ok(app_result?)
         }
 
-        Mode::Repl => Ok(run_repl(saves, saves_dir)?),
+        Mode::Repl => {
+            let mut repl = Repl::new(saves, saves_dir)?;
+            Ok(repl.run()?)
+        }
     }
 }

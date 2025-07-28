@@ -38,6 +38,11 @@ impl CourseList {
         }
     }
 
+    pub fn restore_save(path: impl Into<PathBuf>) -> io::Result<Self> {
+        let data = fs::read_to_string(path.into())?;
+        Ok(serde_json::from_str(&data)?)
+    }
+
     pub fn dump_list(&self) -> io::Result<()> {
         let par = self.file.parent().unwrap();
         if !par.exists() {
@@ -50,7 +55,7 @@ impl CourseList {
         Ok(())
     }
 
-    pub fn restore_list(&mut self) -> io::Result<()> {
+    pub fn restore_self(&mut self) -> io::Result<()> {
         let data = fs::read_to_string(&self.file)?;
         *self = serde_json::from_str(&data)?;
         Ok(())
@@ -249,7 +254,7 @@ mod tests {
 
         let mut restored_list = CourseList::new(&file_path);
         restored_list
-            .restore_list()
+            .restore_self()
             .expect("Failed to restore list");
 
         assert_eq!(course_list.current.len(), restored_list.current.len());
