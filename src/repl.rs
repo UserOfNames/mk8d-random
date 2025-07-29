@@ -8,7 +8,7 @@ use rand::Rng;
 
 use crate::courses::course::Course;
 use crate::courses::course_list::CourseList;
-use crate::templates::mk8d;
+use crate::templates::mk8d::make_mk8d;
 
 pub struct Repl {
     course_list: CourseList,
@@ -17,29 +17,62 @@ pub struct Repl {
 
 impl Repl {
     pub fn new(saves: Vec<DirEntry>, saves_dir: impl Into<PathBuf>) -> anyhow::Result<Self> {
+        let saves_dir = saves_dir.into();
         let mut input: String = String::new();
 
         if saves.is_empty() {
-            println!("No saves found. Creating a default (mk8d), will add more later, maybe");
-            let course_list = mk8d::make_mk8d(saves_dir.into());
-            course_list.dump_list()?;
-            return Err(anyhow::anyhow!("Loading course list"));
+            println!("No saves found. Pick a default:");
+            return Self::pick_default(input, saves_dir);
         }
 
-        println!("Enter the number of the save you want to use:");
-        for (i, dir_entry) in saves.iter().enumerate() {
-            println!("{}: {:?}", i, dir_entry.file_name());
-        }
-        update_input(&mut input, ":> ")?;
+        println!("Load a save or pick a default? (S or D):");
+        update_input(&mut input, ":> ").context("Reading input")?;
 
-        let index: usize = input
+        match input.trim().to_lowercase().as_ref() {
+            "d" => Self::pick_default(input, saves_dir),
+            "s" => Self::load_save(input, saves),
+            _ => Err(anyhow::anyhow!("Error: Invalid selection")),
+        }
+    }
+
+    fn pick_default(mut input: String, saves_dir: PathBuf) -> anyhow::Result<Self> {
+        println!(
+            "Default options:\n\
+            1 - mk8d"
+        );
+
+        update_input(&mut input, ":> ").context("Reading input")?;
+
+        let selection: usize = input
             .trim()
             .parse()
             .context(format!("Parsing input '{}' into number", input))?;
 
+        let course_list = match selection {
+            1 => make_mk8d(saves_dir),
+            _ => return Err(anyhow::anyhow!("Error: Out of bounds selection")),
+        };
+
+        return Ok(Self { course_list, input });
+    }
+
+    fn load_save(mut input: String, saves: Vec<DirEntry>) -> anyhow::Result<Self> {
+        println!("Enter the number of the save you want to use:");
+        for (i, dir_entry) in saves.iter().enumerate() {
+            println!("{}: {:?}", i + 1, dir_entry.file_name());
+        }
+        update_input(&mut input, ":> ")?;
+
+        let mut index: usize = input
+            .trim()
+            .parse()
+            .context(format!("Parsing input '{}' into number", input))?;
+
+        index = index.wrapping_sub(1);
+
         let selection = saves
             .get(index)
-            .ok_or(anyhow::anyhow!("Out of range selection: {}", index))?;
+            .ok_or(anyhow::anyhow!("Error: Out of bounds selection"))?;
 
         Ok(Self {
             course_list: CourseList::restore_save(selection.path())
@@ -84,7 +117,7 @@ impl Repl {
 
                 "tier" => continue_on_err!(self.tier()),
 
-                _ => eprintln!("Unrecognized command."),
+                _ => eprintln!("Error: Unrecognized command."),
             }
         }
 
@@ -204,7 +237,8 @@ impl Repl {
     }
 
     // This is a rather unfortunate partial borrowing hack to get around a mutable borrow issue
-    // I decided that avoiding new allocations was preferable to removing this hack
+    // I decided that avoiding new allocations (when cloning result) was preferable to removing
+    // this hack
     fn search(input: &mut String, sub_list: Vec<&Course>) -> anyhow::Result<Course> {
         for (i, c) in sub_list.iter().enumerate() {
             println!("{}: {}", i + 1, c);
