@@ -104,7 +104,10 @@ impl CourseList {
         self.current.iter().nth(index)
     }
 
-    pub fn get_random_by_chunks(&self, num_chunks: usize) -> Result<impl Iterator<Item = Course>, ()> {
+    pub fn get_random_by_chunks(
+        &self,
+        num_chunks: usize,
+    ) -> Result<impl Iterator<Item = Course>, ()> {
         let curr_vec: Vec<&Course> = self.current.iter().collect();
         let len = self.current.len();
 

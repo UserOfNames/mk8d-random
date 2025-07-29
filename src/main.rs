@@ -1,6 +1,6 @@
 mod courses;
-mod templates;
 mod repl;
+mod templates;
 mod tui;
 
 use std::fs::{DirEntry, create_dir};
@@ -11,7 +11,6 @@ use clap::{self, Parser};
 use dirs;
 
 use repl::Repl;
-
 use tui::tui::Tui;
 
 #[derive(Debug, Clone, ValueEnum)]
