@@ -1,7 +1,7 @@
 use std::fs::DirEntry;
 use std::path::PathBuf;
 
-use anyhow::{self, Context};
+use anyhow::{self, Context, bail};
 use my_lib::continue_on_err;
 use my_lib::io::input::update_input;
 use rand::Rng;
@@ -50,7 +50,7 @@ impl Repl {
 
         let course_list = match selection {
             1 => make_mk8d(saves_dir),
-            _ => return Err(anyhow::anyhow!("Error: Out of bounds selection")),
+            _ => bail!("Error: Out of bounds selection"),
         };
 
         return Ok(Self { course_list, input });
@@ -147,7 +147,7 @@ impl Repl {
             "n" => {}
 
             _ => {
-                return Err(anyhow::anyhow!("Must select Y or N"));
+                bail!("Must select Y or N");
             }
         }
 
@@ -267,11 +267,11 @@ impl Repl {
         let tiered_courses: Vec<Course> = match self.course_list.get_random_by_chunks(size) {
             Ok(c) => c.collect(),
             Err(_) => {
-                return Err(anyhow::anyhow!(
+                bail!(
                     "Error: Could not divide courses into tiers.\n\
                     This probably means the course list cannot be evenly divided by the given prix size.\n\
                     Consider adding or removing courses until the list is evenly divisible."
-                ));
+                );
             }
         };
 
