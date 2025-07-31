@@ -7,6 +7,8 @@ use rand::seq::IndexedRandom;
 use rand::{self, Rng};
 use serde::{Deserialize, Serialize};
 
+use crate::SAVES_DIR;
+
 use super::course::Course;
 use super::history::Action;
 use super::history::History;
@@ -15,51 +17,43 @@ use super::history::History;
 pub struct CourseList {
     current: BTreeSet<Course>,
     removed: BTreeSet<Course>,
-    file: PathBuf,
+    save_name: PathBuf,
     history: History,
 }
 
 impl CourseList {
-    pub fn new(path: impl Into<PathBuf>) -> Self {
+    pub fn new(save_name: impl Into<PathBuf>) -> Self {
         CourseList {
             current: BTreeSet::new(),
             removed: BTreeSet::new(),
-            file: path.into(),
+            save_name: save_name.into(),
             history: History::new(),
         }
     }
 
-    pub fn new_with_list(path: impl Into<PathBuf>, list: BTreeSet<Course>) -> Self {
-        CourseList {
-            current: list,
-            removed: BTreeSet::new(),
-            file: path.into(),
-            history: History::new(),
-        }
-    }
-
-    pub fn restore_save(path: impl Into<PathBuf>) -> io::Result<Self> {
-        let data = fs::read_to_string(path.into())?;
+    pub fn restore_save(save_name: impl Into<PathBuf>) -> io::Result<Self> {
+        let data = fs::read_to_string(SAVES_DIR.join(save_name.into()))?;
         Ok(serde_json::from_str(&data)?)
     }
 
     pub fn dump_list(&self) -> io::Result<()> {
-        let par = self.file.parent().unwrap();
+        let path = self.path();
+        let par = path.parent().unwrap();
         if !par.exists() {
             create_dir_all(par)?;
         }
 
         let data = serde_json::to_string_pretty(&self)?;
-        let mut file = File::create(&self.file)?;
+        let mut file = File::create(path)?;
         file.write_all(data.as_bytes())?;
         Ok(())
     }
 
-    pub fn restore_self(&mut self) -> io::Result<()> {
-        let data = fs::read_to_string(&self.file)?;
-        *self = serde_json::from_str(&data)?;
-        Ok(())
-    }
+    // pub fn restore_self(&mut self) -> io::Result<()> {
+    //     let data = fs::read_to_string(self.path())?;
+    //     *self = serde_json::from_str(&data)?;
+    //     Ok(())
+    // }
 
     pub fn add(&mut self, course: Course) {
         self._add(course.clone());
@@ -169,5 +163,9 @@ impl CourseList {
             Action::Add(c) => self._remove(c),
             Action::Remove(c) => self._add(c),
         };
+    }
+
+    pub fn path(&self) -> PathBuf {
+        SAVES_DIR.join(&self.save_name)
     }
 }

@@ -1,14 +1,13 @@
 use std::fs::DirEntry;
-use std::path::PathBuf;
 
 use anyhow::{self, Context, bail};
 use my_lib::continue_on_err;
 use my_lib::io::input::update_input;
 use rand::Rng;
 
+use crate::MK8D_DEFAULT_SAVE_JSON;
 use crate::courses::course::Course;
 use crate::courses::course_list::CourseList;
-use crate::templates::mk8d::make_mk8d;
 
 pub struct Repl {
     course_list: CourseList,
@@ -16,26 +15,25 @@ pub struct Repl {
 }
 
 impl Repl {
-    pub fn new(saves: Vec<DirEntry>, saves_dir: impl Into<PathBuf>) -> anyhow::Result<Self> {
-        let saves_dir = saves_dir.into();
-        let mut input: String = String::new();
+    pub fn new(saves: Vec<DirEntry>) -> anyhow::Result<Self> {
+        let mut input = String::new();
 
         if saves.is_empty() {
             println!("No saves found. Pick a default:");
-            return Self::pick_default(input, saves_dir);
+            return Self::pick_default(input);
         }
 
         println!("Load a save or pick a default? (S or D):");
         update_input(&mut input, ":> ").context("Reading input")?;
 
         match input.trim().to_lowercase().as_ref() {
-            "d" => Self::pick_default(input, saves_dir),
+            "d" => Self::pick_default(input),
             "s" => Self::load_save(input, saves),
             _ => Err(anyhow::anyhow!("Error: Invalid selection")),
         }
     }
 
-    fn pick_default(mut input: String, saves_dir: PathBuf) -> anyhow::Result<Self> {
+    fn pick_default(mut input: String) -> anyhow::Result<Self> {
         println!(
             "Default options:\n\
             1 - mk8d"
@@ -49,7 +47,7 @@ impl Repl {
             .context(format!("Parsing input '{}' into number", input))?;
 
         let course_list = match selection {
-            1 => make_mk8d(saves_dir),
+            1 => serde_json::from_str(MK8D_DEFAULT_SAVE_JSON).context("Resolving default save")?,
             _ => bail!("Error: Out of bounds selection"),
         };
 

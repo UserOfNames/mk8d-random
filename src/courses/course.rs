@@ -10,6 +10,7 @@ pub struct Coord {
 }
 
 impl Coord {
+    #[allow(unused)]
     pub fn new(row: u8, col: u8, pos: u8) -> Self {
         Coord { row, col, pos }
     }
@@ -29,6 +30,7 @@ pub struct Course {
 }
 
 impl Course {
+    #[allow(unused)]
     pub fn new(rank: u8, coord: Coord, name: &str) -> Self {
         Course {
             name: name.to_string(),
