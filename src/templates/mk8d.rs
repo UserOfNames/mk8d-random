@@ -1,6 +1,9 @@
 use std::{collections::BTreeSet, path::PathBuf};
 
-use crate::courses::{course::{Coord, Course}, course_list::CourseList};
+use crate::courses::{
+    course::{Coord, Course},
+    course_list::CourseList,
+};
 
 pub fn make_mk8d(mut saves_dir: PathBuf) -> CourseList {
     let list = BTreeSet::from([

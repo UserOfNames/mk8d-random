@@ -236,9 +236,6 @@ impl Repl {
         Ok(())
     }
 
-    // This is a rather unfortunate partial borrowing hack to get around a mutable borrow issue
-    // I decided that avoiding new allocations (when cloning result) was preferable to removing
-    // this hack
     fn search(input: &mut String, sub_list: Vec<&Course>) -> anyhow::Result<Course> {
         for (i, c) in sub_list.iter().enumerate() {
             println!("{}: {}", i + 1, c);
