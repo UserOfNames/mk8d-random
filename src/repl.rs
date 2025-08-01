@@ -2,16 +2,18 @@ use std::fs::DirEntry;
 
 use anyhow::{self, Context, bail};
 use my_lib::continue_on_err;
-use my_lib::io::input::update_input;
+use my_lib::io::input::{get_input, update_input};
 use rand::Rng;
 
 use crate::MK8D_DEFAULT_SAVE_JSON;
 use crate::courses::course::Course;
 use crate::courses::course_list::CourseList;
 
+// I'm not sure how the REPL will change in the future, so even though it's kinda stupid to wrap a
+// single field in a struct just to put methods on it, I'm doing it anyways in case the REPL gains
+// more state in the future.
 pub struct Repl {
     course_list: CourseList,
-    input: String,
 }
 
 impl Repl {
@@ -20,26 +22,25 @@ impl Repl {
 
         if saves.is_empty() {
             println!("No saves found. Pick a default:");
-            return Self::pick_default(input);
+            return Self::pick_default();
         }
 
         println!("Load a save or pick a default? (S or D):");
         update_input(&mut input, ":> ").context("Reading input")?;
 
         match input.trim().to_lowercase().as_ref() {
-            "d" => Self::pick_default(input),
-            "s" => Self::load_save(input, saves),
+            "d" => Self::pick_default(),
+            "s" => Self::load_save(saves),
             _ => Err(anyhow::anyhow!("Error: Invalid selection")),
         }
     }
 
-    fn pick_default(mut input: String) -> anyhow::Result<Self> {
+    fn pick_default() -> anyhow::Result<Self> {
         println!(
             "Default options:\n\
             1 - mk8d"
         );
-
-        update_input(&mut input, ":> ").context("Reading input")?;
+        let input = get_input(":> ").context("Reading input")?;
 
         let selection: usize = input
             .trim()
@@ -51,15 +52,15 @@ impl Repl {
             _ => bail!("Error: Out of bounds selection"),
         };
 
-        return Ok(Self { course_list, input });
+        return Ok(Self { course_list });
     }
 
-    fn load_save(mut input: String, saves: Vec<DirEntry>) -> anyhow::Result<Self> {
+    fn load_save(saves: Vec<DirEntry>) -> anyhow::Result<Self> {
         println!("Enter the number of the save you want to use:");
         for (i, dir_entry) in saves.iter().enumerate() {
             println!("{}: {:?}", i + 1, dir_entry.file_name());
         }
-        update_input(&mut input, ":> ")?;
+        let input = get_input(":> ")?;
 
         let mut index: usize = input
             .trim()
@@ -75,16 +76,16 @@ impl Repl {
         Ok(Self {
             course_list: CourseList::restore_save(selection.path())
                 .context("Loading the saved course list")?,
-            input,
         })
     }
 
     pub fn run(&mut self) -> anyhow::Result<()> {
+        let mut input = String::new();
         println!("Running. Enter 'help' for help information.");
         loop {
-            continue_on_err!(update_input(&mut self.input, ":> "), "Error reading input");
+            continue_on_err!(update_input(&mut input, ":> "), "Error reading input");
 
-            match self.input.trim().to_lowercase().as_ref() {
+            match input.trim().to_lowercase().as_ref() {
                 "" => self.generate(),
 
                 "q" | "quit" => {
@@ -135,8 +136,8 @@ impl Repl {
 
     fn quit(&mut self) -> anyhow::Result<()> {
         println!("Save changes before quitting? (Y/N): ");
-        update_input(&mut self.input, ":> ").context("Reading input")?;
-        match self.input.trim().to_lowercase().as_ref() {
+        let input = get_input(":> ").context("Reading input")?;
+        match input.trim().to_lowercase().as_ref() {
             "y" => {
                 self.course_list.dump_list().context("Saving list")?;
                 println!("Saved successfully.");
@@ -187,10 +188,10 @@ impl Repl {
     }
 
     fn reset(&mut self) -> anyhow::Result<()> {
-        update_input(&mut self.input, "Are you sure? (capital 'Y' to confirm): ")
+        let input = get_input("Are you sure? (capital 'Y' to confirm): ")
             .context("Reading input")?;
 
-        match self.input.trim() {
+        match input.trim() {
             "Y" => {
                 self.course_list.reset();
                 println!("Course list reset.");
@@ -217,29 +218,29 @@ impl Repl {
     }
 
     fn add(&mut self) -> anyhow::Result<()> {
-        update_input(&mut self.input, "Search courses: ").context("Reading input")?;
-        let results: Vec<&Course> = self.course_list.search_removed(&self.input).collect();
+        let input = get_input("Search courses: ").context("Reading input")?;
+        let results: Vec<&Course> = self.course_list.search_removed(&input).collect();
 
-        let selection = Self::search(&mut self.input, results)?;
+        let selection = self.search_sub_list(results)?;
         self.course_list.add(selection);
         Ok(())
     }
 
     fn remove(&mut self) -> anyhow::Result<()> {
-        update_input(&mut self.input, "Search courses: ").context("Reading input")?;
-        let results: Vec<&Course> = self.course_list.search_current(&self.input).collect();
+        let input = get_input("Search courses: ").context("Reading input")?;
+        let results: Vec<&Course> = self.course_list.search_current(&input).collect();
 
-        let selection = Self::search(&mut self.input, results)?;
+        let selection = self.search_sub_list(results)?;
         self.course_list.remove(selection);
         Ok(())
     }
 
-    fn search(input: &mut String, sub_list: Vec<&Course>) -> anyhow::Result<Course> {
+    fn search_sub_list(&self, sub_list: Vec<&Course>) -> anyhow::Result<Course> {
         for (i, c) in sub_list.iter().enumerate() {
             println!("{}: {}", i + 1, c);
         }
 
-        update_input(input, "Select a number: ").context("Reading input")?;
+        let input = get_input("Select a number: ").context("Reading input")?;
 
         let index: usize = input
             .parse()
@@ -253,11 +254,10 @@ impl Repl {
     }
 
     fn tier(&mut self) -> anyhow::Result<()> {
-        update_input(&mut self.input, "Enter the size of the prix: ").context("Reading input")?;
-        let size: usize = self
-            .input
+        let input = get_input("Enter the size of the prix: ").context("Reading input")?;
+        let size: usize = input
             .parse()
-            .context(format!("Parsing input '{}' into number", self.input))?;
+            .context(format!("Parsing input '{}' into number", input))?;
 
         let tiered_courses: Vec<Course> = match self.course_list.get_random_by_chunks(size) {
             Ok(c) => c.collect(),

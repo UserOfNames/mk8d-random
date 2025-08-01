@@ -3,8 +3,7 @@ use std::fs::{self, File, create_dir_all};
 use std::io::{self, Write};
 use std::path::PathBuf;
 
-use rand::seq::IndexedRandom;
-use rand::{self, Rng};
+use rand::{self, Rng, seq::IndexedRandom};
 use serde::{Deserialize, Serialize};
 
 use crate::SAVES_DIR;

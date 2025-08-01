@@ -6,9 +6,8 @@ use std::fs::{DirEntry, create_dir};
 use std::path::PathBuf;
 use std::sync::LazyLock;
 
-use anyhow::{self};
-use clap::ValueEnum;
-use clap::{self, Parser};
+use anyhow;
+use clap::{self, Parser, ValueEnum};
 use dirs;
 
 use repl::Repl;
