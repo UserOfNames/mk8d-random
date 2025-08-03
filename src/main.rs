@@ -45,7 +45,8 @@ struct Args {
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
-    let saves: Vec<DirEntry> = std::fs::read_dir(&*SAVES_DIR)?.collect::<Result<_, _>>()?;
+    let saves: Result<Vec<DirEntry>, _> = std::fs::read_dir(&*SAVES_DIR)?.collect();
+    let saves: Vec<DirEntry> = saves?;
 
     match args.mode {
         Mode::Tui => {
