@@ -31,7 +31,7 @@ impl Repl {
         match input.trim().to_lowercase().as_ref() {
             "d" => Self::pick_default(),
             "s" => Self::load_save(saves),
-            _ => Err(anyhow::anyhow!("Error: Invalid selection")),
+            _ => Err(anyhow::anyhow!("Invalid selection")),
         }
     }
 
@@ -49,7 +49,7 @@ impl Repl {
 
         let course_list = match selection {
             1 => serde_json::from_str(MK8D_DEFAULT_SAVE_JSON).context("Resolving default save")?,
-            _ => bail!("Error: Out of bounds selection"),
+            _ => bail!("Out of bounds selection"),
         };
 
         return Ok(Self { course_list });
@@ -71,7 +71,7 @@ impl Repl {
 
         let selection = saves
             .get(index)
-            .ok_or(anyhow::anyhow!("Error: Out of bounds selection"))?;
+            .ok_or(anyhow::anyhow!("Out of bounds selection"))?;
 
         Ok(Self {
             course_list: CourseList::restore_save(selection.path())
@@ -96,7 +96,7 @@ impl Repl {
 
                 "help" => self.help(),
 
-                "save" => continue_on_err!(self.save()),
+                "save" => continue_on_err!(self.save(), "Error"),
 
                 "remaining" | "re" | "ls" => self.remaining(),
 
@@ -104,19 +104,19 @@ impl Repl {
 
                 "history" => self.history(),
 
-                "reset" => continue_on_err!(self.reset()),
+                "reset" => continue_on_err!(self.reset(), "Error"),
 
                 "back" => self.back(),
 
                 "forward" => self.forward(),
 
-                "add" => continue_on_err!(self.add()),
+                "add" => continue_on_err!(self.add(), "Error"),
 
-                "remove" | "rm" | "pop" => continue_on_err!(self.remove()),
+                "remove" | "rm" | "pop" => continue_on_err!(self.remove(), "Error"),
 
-                "tier" => continue_on_err!(self.tier()),
+                "tier" => continue_on_err!(self.tier(), "Error"),
 
-                _ => eprintln!("Error: Unrecognized command."),
+                _ => eprintln!("Unrecognized command."),
             }
         }
 
@@ -248,7 +248,7 @@ impl Repl {
 
         let &selection = sub_list
             .get(index.wrapping_sub(1))
-            .ok_or(anyhow::anyhow!("Selecting course: Out of bounds selection"))?;
+            .ok_or(anyhow::anyhow!("Out of bounds selection"))?;
 
         Ok(selection.clone())
     }
@@ -263,7 +263,7 @@ impl Repl {
             Ok(c) => c.collect(),
             Err(_) => {
                 bail!(
-                    "Error: Could not divide courses into tiers.\n\
+                    "Could not divide courses into tiers.\n\
                     This probably means the course list cannot be evenly divided by the given prix size.\n\
                     Consider adding or removing courses until the list is evenly divisible."
                 );
