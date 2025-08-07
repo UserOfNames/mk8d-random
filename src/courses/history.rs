@@ -65,8 +65,8 @@ impl fmt::Display for History {
         // Past
         match past_slice {
             [] => write!(f, "None")?,
-            [p1] => write!(f, "None <- {}", p1)?,
-            [.., p1] => write!(f, "... <- {}", p1)?,
+            [p1] => write!(f, "None <- {p1}")?,
+            [.., p1] => write!(f, "... <- {p1}")?,
         }
 
         // Current
@@ -75,8 +75,8 @@ impl fmt::Display for History {
         // Future
         match future_slice {
             [] => write!(f, "None")?,
-            [p1] => write!(f, "{} -> None", p1)?,
-            [.., p1] => write!(f, "{} -> ...", p1)?,
+            [p1] => write!(f, "{p1} -> None")?,
+            [.., p1] => write!(f, "{p1} -> ...")?,
         }
 
         Ok(())

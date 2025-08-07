@@ -6,9 +6,7 @@ use std::fs::{DirEntry, create_dir};
 use std::path::PathBuf;
 use std::sync::LazyLock;
 
-use anyhow;
 use clap::{self, Parser, ValueEnum};
-use dirs;
 
 use repl::Repl;
 use tui::tui::Tui;

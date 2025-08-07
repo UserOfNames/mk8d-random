@@ -56,7 +56,7 @@ impl Eq for Course {}
 
 impl PartialOrd for Course {
     fn partial_cmp(&self, other: &Self) -> Option<std::cmp::Ordering> {
-        self.rank.partial_cmp(&other.rank)
+        Some(self.cmp(other))
     }
 }
 

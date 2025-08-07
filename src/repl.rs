@@ -45,14 +45,14 @@ impl Repl {
         let selection: usize = input
             .trim()
             .parse()
-            .context(format!("Parsing input '{}' into number", input))?;
+            .context(format!("Parsing input '{input}' into number"))?;
 
         let course_list = match selection {
             1 => serde_json::from_str(MK8D_DEFAULT_SAVE_JSON).context("Resolving default save")?,
             _ => bail!("Out of bounds selection"),
         };
 
-        return Ok(Self { course_list });
+        Ok(Self { course_list })
     }
 
     fn load_save(saves: Vec<DirEntry>) -> anyhow::Result<Self> {
@@ -65,7 +65,7 @@ impl Repl {
         let mut index: usize = input
             .trim()
             .parse()
-            .context(format!("Parsing input '{}' into number", input))?;
+            .context(format!("Parsing input '{input}' into number"))?;
 
         index = index.wrapping_sub(1);
 
@@ -130,7 +130,7 @@ impl Repl {
             return;
         };
 
-        println!("{}", course);
+        println!("{course}");
         self.course_list.remove(course.clone());
     }
 
@@ -188,8 +188,8 @@ impl Repl {
     }
 
     fn reset(&mut self) -> anyhow::Result<()> {
-        let input = get_input("Are you sure? (capital 'Y' to confirm): ")
-            .context("Reading input")?;
+        let input =
+            get_input("Are you sure? (capital 'Y' to confirm): ").context("Reading input")?;
 
         match input.trim() {
             "Y" => {
@@ -244,7 +244,7 @@ impl Repl {
 
         let index: usize = input
             .parse()
-            .context(format!("Parsing input '{}' into number", input))?;
+            .context(format!("Parsing input '{input}' into number"))?;
 
         let &selection = sub_list
             .get(index.wrapping_sub(1))
@@ -257,7 +257,7 @@ impl Repl {
         let input = get_input("Enter the size of the prix: ").context("Reading input")?;
         let size: usize = input
             .parse()
-            .context(format!("Parsing input '{}' into number", input))?;
+            .context(format!("Parsing input '{input}' into number"))?;
 
         let tiered_courses: Vec<Course> = match self.course_list.get_random_by_chunks(size) {
             Ok(c) => c.collect(),
