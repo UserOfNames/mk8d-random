@@ -25,7 +25,8 @@
           includeNDK = true;
         };
 
-        rustWithTargets = pkgs.rust-bin.stable.latest.default.override {
+        rust-toolchain = pkgs.rust-bin.stable.latest.default.override {
+          extensions = [ "rust-src" "rust-analyzer" ];
           targets = [ "aarch64-linux-android" ];
         };
 
@@ -38,7 +39,7 @@
           ANDROID_NDK_ROOT="${android-home}/ndk/";
 
           packages = [
-            rustWithTargets
+            rust-toolchain
             android-sdk
             cargo-ndk
           ];
