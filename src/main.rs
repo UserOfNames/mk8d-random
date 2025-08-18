@@ -6,6 +6,7 @@ use std::fs::{DirEntry, create_dir};
 use std::path::PathBuf;
 use std::sync::LazyLock;
 
+use anyhow::Context;
 use clap::{self, Parser, ValueEnum};
 
 use repl::Repl;
@@ -43,7 +44,9 @@ struct Args {
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
-    let saves: Result<Vec<DirEntry>, _> = std::fs::read_dir(&*SAVES_DIR)?.collect();
+    let saves: Result<Vec<DirEntry>, _> = std::fs::read_dir(&*SAVES_DIR)
+        .context(format!("Accessing saves directory {:?}", SAVES_DIR))?
+        .collect();
     let saves: Vec<DirEntry> = saves?;
 
     match args.mode {
