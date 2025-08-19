@@ -14,15 +14,17 @@ use super::history::History;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseList {
-    current: BTreeSet<Course>,
-    removed: BTreeSet<Course>,
-    save_name: PathBuf,
+    pub save_name: PathBuf,
+    pub courses: Vec<Course>,
+    current: BTreeSet<usize>,
+    removed: BTreeSet<usize>,
     history: History,
 }
 
 impl CourseList {
     pub fn new(save_name: impl Into<PathBuf>) -> Self {
         CourseList {
+            courses: Vec::new(),
             current: BTreeSet::new(),
             removed: BTreeSet::new(),
             save_name: save_name.into(),
@@ -54,54 +56,56 @@ impl CourseList {
     //     Ok(())
     // }
 
-    pub fn add(&mut self, course: Course) {
-        self._add(course.clone());
-        self.history.push(Action::Add(course));
+    pub fn add(&mut self, course_i: usize) {
+        self._add(course_i);
+        self.history.push(Action::Add(course_i));
     }
 
-    fn _add(&mut self, course: Course) {
-        self.removed.remove(&course);
-        self.current.insert(course);
+    fn _add(&mut self, course_i: usize) {
+        self.removed.remove(&course_i);
+        self.current.insert(course_i);
     }
 
-    pub fn remove(&mut self, course: Course) {
-        self._remove(course.clone());
-        self.history.push(Action::Remove(course));
+    pub fn remove(&mut self, course_i: usize) {
+        self._remove(course_i);
+        self.history.push(Action::Remove(course_i));
     }
 
-    fn _remove(&mut self, course: Course) {
-        self.current.remove(&course);
-        self.removed.insert(course);
+    fn _remove(&mut self, course_i: usize) {
+        self.current.remove(&course_i);
+        self.removed.insert(course_i);
     }
 
-    pub fn search_current(&self, searched: &str) -> impl Iterator<Item = &Course> {
+    pub fn search_current(&self, searched: &str) -> impl Iterator<Item = usize> {
         let key = searched.to_lowercase();
         self.current
             .iter()
-            .filter(move |c| c.name.to_lowercase().contains(&key))
+            .copied()
+            .filter(move |&i| self.courses[i].name.to_lowercase().contains(&key))
     }
 
-    pub fn search_removed(&self, searched: &str) -> impl Iterator<Item = &Course> {
+    pub fn search_removed(&self, searched: &str) -> impl Iterator<Item = usize> {
         let key = searched.to_lowercase();
         self.removed
             .iter()
-            .filter(move |c| c.name.to_lowercase().contains(&key))
+            .copied()
+            .filter(move |&i| self.courses[i].name.to_lowercase().contains(&key))
     }
 
-    pub fn get_random(&self) -> Option<&Course> {
+    pub fn get_random(&self) -> Option<usize> {
         if self.current.is_empty() {
             return None;
         };
 
         let index: usize = rand::rng().random_range(0..self.current.len());
-        self.current.iter().nth(index)
+        self.current.iter().nth(index).copied()
     }
 
     pub fn get_random_by_chunks(
         &self,
         num_chunks: usize,
-    ) -> Result<impl Iterator<Item = Course>, ()> {
-        let curr_vec: Vec<&Course> = self.current.iter().collect();
+    ) -> Result<impl Iterator<Item = usize>, ()> {
+        let curr_vec: Vec<usize> = self.current.iter().copied().collect();
         let len = self.current.len();
 
         if len % num_chunks != 0 {
@@ -110,12 +114,12 @@ impl CourseList {
         let chunk_size = len / num_chunks;
 
         let mut rng = rand::rng();
-        let mut res: Vec<Course> = Vec::with_capacity(num_chunks);
+        let mut res: Vec<usize> = Vec::with_capacity(num_chunks);
 
         for chunk in curr_vec.chunks_exact(chunk_size) {
             // We already validated the chunks, so unwrap() is fine here
             let selection = *chunk.choose(&mut rng).unwrap();
-            res.push(selection.clone());
+            res.push(selection);
         }
 
         Ok(res.into_iter())
@@ -130,12 +134,12 @@ impl CourseList {
         &self.history
     }
 
-    pub fn get_current(&self) -> &BTreeSet<Course> {
-        &self.current
+    pub fn get_current(&self) -> impl Iterator<Item = usize> {
+        self.current.iter().copied()
     }
 
-    pub fn get_removed(&self) -> &BTreeSet<Course> {
-        &self.removed
+    pub fn get_removed(&self) -> impl Iterator<Item = usize> {
+        self.removed.iter().copied()
     }
 
     pub fn roll_back(&mut self) -> Result<(), ()> {
@@ -152,15 +156,15 @@ impl CourseList {
 
     fn apply_action(&mut self, action: Action) {
         match action {
-            Action::Add(c) => self._add(c),
-            Action::Remove(c) => self._remove(c),
+            Action::Add(i) => self._add(i),
+            Action::Remove(i) => self._remove(i),
         };
     }
 
     fn undo_action(&mut self, action: Action) {
         match action {
-            Action::Add(c) => self._remove(c),
-            Action::Remove(c) => self._add(c),
+            Action::Add(i) => self._remove(i),
+            Action::Remove(i) => self._add(i),
         };
     }
 

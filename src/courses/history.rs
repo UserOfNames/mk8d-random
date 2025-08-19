@@ -1,29 +1,27 @@
-use std::fmt;
-
 use serde::{Deserialize, Serialize};
 
 use super::course::Course;
 
 // An action the user takes, e.g. adding or removing a course
-#[derive(Serialize, Deserialize, Debug, Clone, PartialEq)]
+#[derive(Serialize, Deserialize, Debug, Clone, Copy, PartialEq)]
 pub enum Action {
-    Add(Course),
-    Remove(Course),
+    Add(usize),
+    Remove(usize),
 }
 
-impl fmt::Display for Action {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+impl Action {
+    fn to_string(self, courses: &[Course]) -> String {
         match self {
-            Action::Add(c) => write!(f, "Add({})", c.name),
-            Action::Remove(c) => write!(f, "Remove({})", c.name),
+            Self::Add(i) => format!("Add({})", courses[i].name),
+            Self::Remove(i) => format!("Remove({})", courses[i].name),
         }
     }
 }
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct History {
-    past: Vec<Action>,
-    future: Vec<Action>,
+    pub past: Vec<Action>,
+    pub future: Vec<Action>,
 }
 
 impl History {
@@ -41,13 +39,13 @@ impl History {
 
     pub fn back(&mut self) -> Option<Action> {
         let res = self.past.pop()?;
-        self.future.push(res.clone());
+        self.future.push(res);
         Some(res)
     }
 
     pub fn forward(&mut self) -> Option<Action> {
         let res = self.future.pop()?;
-        self.past.push(res.clone());
+        self.past.push(res);
         Some(res)
     }
 
@@ -55,30 +53,26 @@ impl History {
         self.past.clear();
         self.future.clear();
     }
-}
 
-impl fmt::Display for History {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+    pub fn to_string(&self, courses: &[Course]) -> String {
         let past_slice = self.past.as_slice();
         let future_slice = self.future.as_slice();
+        let mut res = String::new();
 
-        // Past
         match past_slice {
-            [] => write!(f, "None")?,
-            [p1] => write!(f, "None <- {p1}")?,
-            [.., p1] => write!(f, "... <- {p1}")?,
+            [] => res.push_str("None"),
+            [p1] => res.push_str(format!("None <- {}", p1.to_string(courses)).as_str()),
+            [.., p1] => res.push_str(format!("... <- {}", p1.to_string(courses)).as_str()),
         }
 
-        // Current
-        write!(f, " <- Current -> ")?;
+        res.push_str(" <- Current -> ");
 
-        // Future
         match future_slice {
-            [] => write!(f, "None")?,
-            [p1] => write!(f, "{p1} -> None")?,
-            [.., p1] => write!(f, "{p1} -> ...")?,
+            [] => res.push_str("None"),
+            [p1] => res.push_str(format!("{} -> None", p1.to_string(courses)).as_str()),
+            [.., p1] => res.push_str(format!("{} -> ...", p1.to_string(courses)).as_str()),
         }
 
-        Ok(())
+        res
     }
 }

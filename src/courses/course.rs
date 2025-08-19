@@ -26,12 +26,12 @@ impl Display for Coord {
 pub struct Course {
     pub name: String,
     pub coord: Coord,
-    pub rank: u8,
+    pub rank: usize,
 }
 
 impl Course {
     #[allow(unused)]
-    pub fn new(rank: u8, coord: Coord, name: &str) -> Self {
+    pub fn new(rank: usize, coord: Coord, name: &str) -> Self {
         Course {
             name: name.to_string(),
             coord,

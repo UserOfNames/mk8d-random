@@ -4,9 +4,9 @@ use anyhow::{self, Context, bail};
 use my_lib::continue_on_err;
 use my_lib::io::input::{get_input, update_input};
 use rand::Rng;
+use rand::seq::IndexedRandom;
 
 use crate::MK8D_DEFAULT_SAVE_JSON;
-use crate::courses::course::Course;
 use crate::courses::course_list::CourseList;
 
 // I'm not sure how the REPL will change in the future, so even though it's kinda stupid to wrap a
@@ -124,14 +124,14 @@ impl Repl {
     }
 
     fn generate(&mut self) {
-        let Some(course) = self.course_list.get_random() else {
+        let Some(course_i) = self.course_list.get_random() else {
             println!("The course list is empty. Resetting.");
             self.course_list.reset();
             return;
         };
 
-        println!("{course}");
-        self.course_list.remove(course.clone());
+        println!("{}", self.course_list.courses[course_i]);
+        self.course_list.remove(course_i);
     }
 
     fn quit(&mut self) -> anyhow::Result<()> {
@@ -160,31 +160,35 @@ impl Repl {
     }
 
     fn remaining(&self) {
-        let current = self.course_list.get_current();
+        let current: Vec<usize> = self.course_list.get_current().collect();
         if current.is_empty() {
             println!("The course list is empty.");
             return;
         }
 
-        let strings: Vec<String> = current.iter().map(|c| c.to_string()).collect();
-        println!("{}", strings.join("\n"));
+        for i in current.iter() {
+            println!("{}", self.course_list.courses[*i]);
+        }
         println!("There are {} courses in the list.", current.len())
     }
 
     fn used(&self) {
-        let removed = self.course_list.get_removed();
+        let removed: Vec<usize> = self.course_list.get_removed().collect();
         if removed.is_empty() {
             println!("No courses have been used.");
             return;
         }
 
-        let strings: Vec<String> = removed.iter().map(|c| c.to_string()).collect();
-        println!("{}", strings.join("\n"));
+        for i in removed.iter() {
+            println!("{}", self.course_list.courses[*i]);
+        }
         println!("{} courses have been used.", removed.len())
     }
 
     fn history(&self) {
-        println!("{}", self.course_list.get_history());
+        let history = self.course_list.get_history();
+        let courses = &self.course_list.courses;
+        println!("{}", history.to_string(courses));
     }
 
     fn reset(&mut self) -> anyhow::Result<()> {
@@ -219,7 +223,7 @@ impl Repl {
 
     fn add(&mut self) -> anyhow::Result<()> {
         let input = get_input("Search courses: ").context("Reading input")?;
-        let results: Vec<&Course> = self.course_list.search_removed(&input).collect();
+        let results: Vec<usize> = self.course_list.search_removed(&input).collect();
 
         let selection = self.search_sub_list(results)?;
         self.course_list.add(selection);
@@ -228,16 +232,16 @@ impl Repl {
 
     fn remove(&mut self) -> anyhow::Result<()> {
         let input = get_input("Search courses: ").context("Reading input")?;
-        let results: Vec<&Course> = self.course_list.search_current(&input).collect();
+        let results: Vec<usize> = self.course_list.search_current(&input).collect();
 
         let selection = self.search_sub_list(results)?;
         self.course_list.remove(selection);
         Ok(())
     }
 
-    fn search_sub_list(&self, sub_list: Vec<&Course>) -> anyhow::Result<Course> {
-        for (i, c) in sub_list.iter().enumerate() {
-            println!("{}: {}", i + 1, c);
+    fn search_sub_list(&self, sub_list: Vec<usize>) -> anyhow::Result<usize> {
+        for (i, course_i) in sub_list.iter().enumerate() {
+            println!("{}: {}", i + 1, self.course_list.courses[*course_i]);
         }
 
         let input = get_input("Select a number: ").context("Reading input")?;
@@ -250,7 +254,7 @@ impl Repl {
             .get(index.wrapping_sub(1))
             .ok_or(anyhow::anyhow!("Out of bounds selection"))?;
 
-        Ok(selection.clone())
+        Ok(selection)
     }
 
     fn tier(&mut self) -> anyhow::Result<()> {
@@ -259,8 +263,8 @@ impl Repl {
             .parse()
             .context(format!("Parsing input '{input}' into number"))?;
 
-        let tiered_courses: Vec<Course> = match self.course_list.get_random_by_chunks(size) {
-            Ok(c) => c.collect(),
+        let tiered_courses: Vec<usize> = match self.course_list.get_random_by_chunks(size) {
+            Ok(i) => i.collect(),
             Err(_) => {
                 bail!(
                     "Could not divide courses into tiers.\n\
@@ -270,13 +274,52 @@ impl Repl {
             }
         };
 
-        if run_tiered_list(tiered_courses.clone()) {
+        if self.run_tiered_list(tiered_courses.clone()) {
             for course in tiered_courses {
                 self.course_list.remove(course);
             }
         }
 
         Ok(())
+    }
+
+    fn run_tiered_list(&mut self, mut list: Vec<usize>) -> bool {
+        let mut rng = rand::rng();
+        println!(
+            "Entered tiered list. Type 'back' to return without removing the selected courses."
+        );
+
+        let mut input: String = String::new();
+        while !list.is_empty() {
+            continue_on_err!(update_input(&mut input, ":> "), "Error reading input");
+
+            match input.trim().to_lowercase().as_ref() {
+                "" => {
+                    let sub_index = rng.random_range(0..list.len());
+                    let course_index = list[sub_index];
+                    println!("{}", self.course_list.courses[course_index]);
+                    list.remove(sub_index);
+                }
+
+                "back" => {
+                    println!("Returning to main list...");
+                    return false;
+                }
+
+                "ls" => {
+                    for i in list.iter() {
+                        println!("{}", self.course_list.courses[*i]);
+                    }
+                }
+
+                _ => {
+                    println!("Unrecognized command.");
+                }
+            }
+        }
+
+        println!("Tiered list exhausted. Returning to main list...");
+        true
     }
 
     fn help(&self) {
@@ -312,39 +355,4 @@ impl Repl {
 
         println!("---------------------------------------------------");
     }
-}
-
-fn run_tiered_list(mut list: Vec<Course>) -> bool {
-    let mut rng = rand::rng();
-    println!("Entered tiered list. Type 'back' to return without removing the selected courses.");
-
-    let mut input: String = String::new();
-    while !list.is_empty() {
-        continue_on_err!(update_input(&mut input, ":> "), "Error reading input");
-
-        match input.trim().to_lowercase().as_ref() {
-            "" => {
-                let index = rng.random_range(0..list.len());
-                println!("{}", list[index]);
-                list.remove(index);
-            }
-
-            "back" => {
-                println!("Returning to main list...");
-                return false;
-            }
-
-            "ls" => {
-                let strings: Vec<String> = list.iter().map(|c| c.to_string()).collect();
-                println!("{}", strings.join("\n"));
-            }
-
-            _ => {
-                println!("Unrecognized command.");
-            }
-        }
-    }
-
-    println!("Tiered list exhausted. Returning to main list...");
-    true
 }
