@@ -3,7 +3,7 @@ use std::fs::{self, File, create_dir_all};
 use std::io::{self, Write};
 use std::path::PathBuf;
 
-use rand::{self, Rng, seq::IndexedRandom};
+use rand::seq::{IndexedRandom, IteratorRandom};
 use serde::{Deserialize, Serialize};
 
 use crate::SAVES_DIR;
@@ -97,8 +97,7 @@ impl CourseList {
             return None;
         };
 
-        let index: usize = rand::rng().random_range(0..self.current.len());
-        self.current.iter().nth(index).copied()
+        self.current.iter().choose(&mut rand::rng()).copied()
     }
 
     pub fn get_random_by_chunks(

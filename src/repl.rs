@@ -4,14 +4,10 @@ use anyhow::{self, Context, bail};
 use my_lib::continue_on_err;
 use my_lib::io::input::{get_input, update_input};
 use rand::Rng;
-use rand::seq::IndexedRandom;
 
 use crate::MK8D_DEFAULT_SAVE_JSON;
 use crate::courses::course_list::CourseList;
 
-// I'm not sure how the REPL will change in the future, so even though it's kinda stupid to wrap a
-// single field in a struct just to put methods on it, I'm doing it anyways in case the REPL gains
-// more state in the future.
 pub struct Repl {
     course_list: CourseList,
 }
