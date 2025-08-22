@@ -5,8 +5,9 @@ use my_lib::continue_on_err;
 use my_lib::io::input::{get_input, update_input};
 use rand::Rng;
 
+use mk8d_random::courses::course_list::CourseList;
+
 use crate::MK8D_DEFAULT_SAVE_JSON;
-use crate::courses::course_list::CourseList;
 
 pub struct Repl {
     course_list: CourseList,

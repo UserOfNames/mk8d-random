@@ -9,7 +9,7 @@ use ratatui::{
     widgets::Widget,
 };
 
-use crate::courses::course_list::CourseList;
+use mk8d_random::courses::course_list::CourseList;
 
 #[derive(Debug)]
 pub enum CurrentScreen {

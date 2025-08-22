@@ -1,32 +1,17 @@
-mod courses;
 mod repl;
 mod tui;
 
 use std::fs::{DirEntry, create_dir};
-use std::path::PathBuf;
-use std::sync::LazyLock;
 
 use anyhow::Context;
 use clap::{self, Parser, ValueEnum};
+
+use mk8d_random::SAVES_DIR;
 
 use repl::Repl;
 use tui::tui::Tui;
 
 const MK8D_DEFAULT_SAVE_JSON: &str = include_str!("../data/mk8d_default_save.json");
-
-static SAVES_DIR: LazyLock<PathBuf> = LazyLock::new(|| {
-    let mut saves_dir = dirs::data_dir().expect("Could not find data directory");
-
-    saves_dir.push("mk8d-random");
-    if !saves_dir
-        .try_exists()
-        .expect("Could not identify whether the saves directoy exists")
-    {
-        create_dir(&saves_dir).expect("Saves directory not found and could not be created");
-    }
-
-    saves_dir
-});
 
 #[derive(Debug, Clone, ValueEnum)]
 enum Mode {
@@ -44,8 +29,12 @@ struct Args {
 fn main() -> anyhow::Result<()> {
     let args = Args::parse();
 
+    if !SAVES_DIR.try_exists().context("Accessing save directory")? {
+        create_dir(&*SAVES_DIR).context("Creating save directory")?;
+    }
+
     let saves: Result<Vec<DirEntry>, _> = std::fs::read_dir(&*SAVES_DIR)
-        .context(format!("Accessing saves directory {:?}", SAVES_DIR))?
+        .context(format!("Accessing save directory {:?}", SAVES_DIR))?
         .collect();
     let saves: Vec<DirEntry> = saves?;
 
