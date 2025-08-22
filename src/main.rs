@@ -42,7 +42,7 @@ fn main() -> anyhow::Result<()> {
         Mode::Tui => {
             todo!("Implement TUI");
             let mut terminal = ratatui::init();
-            let app_result = Tui::new().run(&mut terminal);
+            let app_result = Tui::new(saves)?.run(&mut terminal);
             ratatui::restore();
             Ok(app_result?)
         }
