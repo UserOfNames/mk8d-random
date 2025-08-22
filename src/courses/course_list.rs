@@ -1,3 +1,5 @@
+#![allow(clippy::result_unit_err)]
+
 use std::collections::BTreeSet;
 use std::fs::{self, File, create_dir_all};
 use std::io::{self, Write};
@@ -14,8 +16,8 @@ use super::history::History;
 
 #[derive(Serialize, Deserialize, Debug)]
 pub struct CourseList {
-    pub save_name: PathBuf,
     pub courses: Vec<Course>,
+    pub save_name: PathBuf,
     current: BTreeSet<usize>,
     removed: BTreeSet<usize>,
     history: History,
@@ -25,10 +27,10 @@ impl CourseList {
     pub fn new(save_name: impl Into<PathBuf>) -> Self {
         CourseList {
             courses: Vec::new(),
+            save_name: save_name.into(),
             current: BTreeSet::new(),
             removed: BTreeSet::new(),
-            save_name: save_name.into(),
-            history: History::new(),
+            history: History::default(),
         }
     }
 
@@ -129,14 +131,17 @@ impl CourseList {
         self.history.reset();
     }
 
+    #[inline]
     pub fn get_history(&self) -> &History {
         &self.history
     }
 
+    #[inline]
     pub fn get_current(&self) -> impl Iterator<Item = usize> {
         self.current.iter().copied()
     }
 
+    #[inline]
     pub fn get_removed(&self) -> impl Iterator<Item = usize> {
         self.removed.iter().copied()
     }

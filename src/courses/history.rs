@@ -18,20 +18,13 @@ impl Action {
     }
 }
 
-#[derive(Serialize, Deserialize, Debug)]
+#[derive(Serialize, Deserialize, Debug, Default)]
 pub struct History {
     pub past: Vec<Action>,
     pub future: Vec<Action>,
 }
 
 impl History {
-    pub fn new() -> Self {
-        History {
-            past: Vec::new(),
-            future: Vec::new(),
-        }
-    }
-
     pub fn push(&mut self, action: Action) {
         self.future.clear();
         self.past.push(action);
