@@ -1,6 +1,5 @@
 use std::fs::DirEntry;
 use std::io;
-use std::path::PathBuf;
 
 use mk8d_random::courses::course_list::CourseList;
 use ratatui::DefaultTerminal;
