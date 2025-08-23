@@ -109,10 +109,10 @@
       "rank": 12
     },
     {
-      "name": "MK8  Sunshine Airport",
+      "name": "MK8  Cloudtop Cruise",
       "coord": {
         "row": 1,
-        "col": 3,
+        "col": 4,
         "pos": 1
       },
       "rank": 13
@@ -190,10 +190,10 @@
       "rank": 21
     },
     {
-      "name": "MK8  Cloudtop Cruise",
+      "name": "MK8  Sunshine Airport",
       "coord": {
         "row": 1,
-        "col": 4,
+        "col": 3,
         "pos": 1
       },
       "rank": 22
@@ -523,10 +523,10 @@
       "rank": 58
     },
     {
-      "name": "MK8  Animal Crossing Circuit",
+      "name": "MK8  Shy Guy Falls",
       "coord": {
         "row": 1,
-        "col": 6,
+        "col": 2,
         "pos": 4
       },
       "rank": 59
@@ -595,10 +595,10 @@
       "rank": 66
     },
     {
-      "name": "MK8  Shy Guy Falls",
+      "name": "MK8  Animal Crossing Circuit",
       "coord": {
         "row": 1,
-        "col": 2,
+        "col": 6,
         "pos": 4
       },
       "rank": 67
