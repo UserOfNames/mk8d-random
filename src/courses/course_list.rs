@@ -19,7 +19,6 @@ pub struct CourseList {
     pub courses: Vec<Course>,
     pub save_name: PathBuf,
     current: BTreeSet<usize>,
-    removed: BTreeSet<usize>,
     history: History,
 }
 
@@ -29,7 +28,6 @@ impl CourseList {
             courses: Vec::new(),
             save_name: save_name.into(),
             current: BTreeSet::new(),
-            removed: BTreeSet::new(),
             history: History::default(),
         }
     }
@@ -64,7 +62,6 @@ impl CourseList {
     }
 
     fn _add(&mut self, course_i: usize) {
-        self.removed.remove(&course_i);
         self.current.insert(course_i);
     }
 
@@ -75,7 +72,6 @@ impl CourseList {
 
     fn _remove(&mut self, course_i: usize) {
         self.current.remove(&course_i);
-        self.removed.insert(course_i);
     }
 
     pub fn search_current(&self, searched: &str) -> impl Iterator<Item = usize> {
@@ -88,9 +84,7 @@ impl CourseList {
 
     pub fn search_removed(&self, searched: &str) -> impl Iterator<Item = usize> {
         let key = searched.to_lowercase();
-        self.removed
-            .iter()
-            .copied()
+        self.get_removed()
             .filter(move |&i| self.courses[i].name.to_lowercase().contains(&key))
     }
 
@@ -127,7 +121,7 @@ impl CourseList {
     }
 
     pub fn reset(&mut self) {
-        self.current.append(&mut self.removed);
+        self.current.extend(self.get_removed());
         self.history.reset();
     }
 
@@ -141,9 +135,11 @@ impl CourseList {
         self.current.iter().copied()
     }
 
-    #[inline]
-    pub fn get_removed(&self) -> impl Iterator<Item = usize> {
-        self.removed.iter().copied()
+    pub fn get_removed(&self) -> impl Iterator<Item = usize> + use<> {
+        let current = self.current.clone();
+
+        (0..self.courses.len())
+            .filter(move |x| !current.contains(x))
     }
 
     pub fn roll_back(&mut self) -> Result<(), ()> {
