@@ -39,10 +39,7 @@ impl CourseList {
 
     pub fn dump_list(&self) -> io::Result<()> {
         let path = self.path();
-        let par = path.parent().unwrap();
-        if !par.exists() {
-            create_dir_all(par)?;
-        }
+        debug_assert!(path.parent().unwrap().exists());
 
         let data = serde_json::to_string_pretty(&self)?;
         let mut file = File::create(path)?;
