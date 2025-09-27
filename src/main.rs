@@ -1,3 +1,7 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::needless_continue)]
+#![allow(clippy::unit_arg)]
+
 mod repl;
 mod tui;
 
@@ -34,7 +38,7 @@ fn main() -> anyhow::Result<()> {
     }
 
     let saves: Result<Vec<DirEntry>, _> = std::fs::read_dir(&*SAVES_DIR)
-        .context(format!("Accessing save directory {:?}", SAVES_DIR))?
+        .context(format!("Accessing save directory {SAVES_DIR:?}"))?
         .collect();
     let saves: Vec<DirEntry> = saves?;
 
@@ -49,7 +53,7 @@ fn main() -> anyhow::Result<()> {
 
         Mode::Repl => {
             let mut repl = Repl::new(saves)?;
-            Ok(repl.run()?)
+            Ok(repl.run())
         }
     }
 }

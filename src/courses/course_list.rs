@@ -54,20 +54,20 @@ impl CourseList {
     // }
 
     pub fn add(&mut self, course_i: usize) {
-        self._add(course_i);
+        self.inner_add(course_i);
         self.history.push(Action::Add(course_i));
     }
 
-    fn _add(&mut self, course_i: usize) {
+    fn inner_add(&mut self, course_i: usize) {
         self.current.insert(course_i);
     }
 
     pub fn remove(&mut self, course_i: usize) {
-        self._remove(course_i);
+        self.inner_remove(course_i);
         self.history.push(Action::Remove(course_i));
     }
 
-    fn _remove(&mut self, course_i: usize) {
+    fn inner_remove(&mut self, course_i: usize) {
         self.current.remove(&course_i);
     }
 
@@ -88,7 +88,7 @@ impl CourseList {
     pub fn get_random(&self) -> Option<usize> {
         if self.current.is_empty() {
             return None;
-        };
+        }
 
         self.current.iter().choose(&mut rand::rng()).copied()
     }
@@ -100,7 +100,7 @@ impl CourseList {
         let curr_vec: Vec<usize> = self.current.iter().copied().collect();
         let len = self.current.len();
 
-        if len % num_chunks != 0 {
+        if !len.is_multiple_of(num_chunks) {
             return Err(());
         }
         let chunk_size = len / num_chunks;
@@ -153,16 +153,16 @@ impl CourseList {
 
     fn apply_action(&mut self, action: Action) {
         match action {
-            Action::Add(i) => self._add(i),
-            Action::Remove(i) => self._remove(i),
-        };
+            Action::Add(i) => self.inner_add(i),
+            Action::Remove(i) => self.inner_remove(i),
+        }
     }
 
     fn undo_action(&mut self, action: Action) {
         match action {
-            Action::Add(i) => self._remove(i),
-            Action::Remove(i) => self._add(i),
-        };
+            Action::Add(i) => self.inner_remove(i),
+            Action::Remove(i) => self.inner_add(i),
+        }
     }
 
     pub fn path(&self) -> PathBuf {

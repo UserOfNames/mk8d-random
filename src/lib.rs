@@ -1,3 +1,6 @@
+#![warn(clippy::all, clippy::pedantic)]
+#![allow(clippy::must_use_candidate)]
+
 use std::path::PathBuf;
 use std::sync::LazyLock;
 

@@ -55,7 +55,7 @@ impl Repl {
     fn load_save(saves: Vec<DirEntry>) -> anyhow::Result<Self> {
         println!("Enter the number of the save you want to use:");
         for (i, dir_entry) in saves.iter().enumerate() {
-            println!("{}: {:?}", i + 1, dir_entry.file_name());
+            println!("{}: {}", i + 1, dir_entry.file_name().display());
         }
         let input = get_input(":> ")?;
 
@@ -76,7 +76,7 @@ impl Repl {
         })
     }
 
-    pub fn run(&mut self) -> anyhow::Result<()> {
+    pub fn run(&mut self) {
         let mut input = String::new();
         println!("Running. Enter 'help' for help information.");
         loop {
@@ -116,8 +116,6 @@ impl Repl {
                 _ => eprintln!("Unrecognized command."),
             }
         }
-
-        Ok(())
     }
 
     fn generate(&mut self) {
