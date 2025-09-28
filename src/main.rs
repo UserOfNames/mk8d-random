@@ -1,5 +1,8 @@
 #![warn(clippy::all, clippy::pedantic)]
+
+#![allow(clippy::ignored_unit_patterns)]
 #![allow(clippy::needless_continue)]
+#![allow(clippy::needless_pass_by_value)]
 #![allow(clippy::unit_arg)]
 
 mod repl;

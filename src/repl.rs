@@ -91,7 +91,7 @@ impl Repl {
                     break;
                 }
 
-                "help" => self.help(),
+                "help" => Self::help(),
 
                 "save" => continue_on_err!(self.save(), "Error"),
 
@@ -161,10 +161,10 @@ impl Repl {
             return;
         }
 
-        for i in current.iter() {
+        for i in &current {
             println!("{}", self.course_list.courses[*i]);
         }
-        println!("There are {} courses in the list.", current.len())
+        println!("There are {} courses in the list.", current.len());
     }
 
     fn used(&self) {
@@ -174,10 +174,10 @@ impl Repl {
             return;
         }
 
-        for i in removed.iter() {
+        for i in &removed {
             println!("{}", self.course_list.courses[*i]);
         }
-        println!("{} courses have been used.", removed.len())
+        println!("{} courses have been used.", removed.len());
     }
 
     fn history(&self) {
@@ -302,7 +302,7 @@ impl Repl {
                 }
 
                 "ls" => {
-                    for i in list.iter() {
+                    for i in &list {
                         println!("{}", self.course_list.courses[*i]);
                     }
                 }
@@ -317,7 +317,7 @@ impl Repl {
         true
     }
 
-    fn help(&self) {
+    fn help() {
         println!("---------------------------------------------------");
 
         println!(

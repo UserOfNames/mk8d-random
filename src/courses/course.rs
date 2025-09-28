@@ -1,7 +1,11 @@
+//! Module defining the `Course` struct and its components.
+
 use std::fmt::{self, Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+/// Defines a coordinate in the selection screen: row and column give a cup, and position is the
+/// number of the course in that cup.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Coord {
     row: u8,
@@ -10,6 +14,7 @@ pub struct Coord {
 }
 
 impl Coord {
+    /// Create a new coordinate.
     #[allow(unused)]
     pub fn new(row: u8, col: u8, pos: u8) -> Self {
         Coord { row, col, pos }
@@ -22,18 +27,25 @@ impl Display for Coord {
     }
 }
 
+/// A course.
 #[derive(Serialize, Deserialize, Debug, Clone)]
 pub struct Course {
+    /// The course's name, e.g. "Rainbow Road."
     pub name: String,
+    /// The course's position in the selection screen.
     pub coord: Coord,
+    /// The course's rank quality ranking relative to other courses. This should be unique,
+    /// descending, and start at 1. If there are N courses in the game, 1 is the best and N is the
+    /// worst.
     pub rank: usize,
 }
 
 impl Course {
+    /// Create a new course.
     #[allow(unused)]
     pub fn new(rank: usize, coord: Coord, name: &str) -> Self {
         Course {
-            name: name.to_string(),
+            name: name.to_owned(),
             coord,
             rank,
         }
