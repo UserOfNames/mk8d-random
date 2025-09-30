@@ -4,9 +4,42 @@ use std::fmt::{self, Display, Formatter};
 
 use serde::{Deserialize, Serialize};
 
+/// Game from which a given `Course` originated.
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
+#[allow(missing_docs)]
+#[non_exhaustive]
+pub enum Origin {
+    SNES,
+    GBA,
+    N64,
+    GCN,
+    DS,
+    Wii,
+    TDS,
+    Tour,
+    MK8,
+}
+
+impl Display for Origin {
+    #[rustfmt::skip]
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::SNES => "SNES",
+            Self::GBA => "GBA",
+            Self::N64 => "N64",
+            Self::GCN => "GCN",
+            Self::DS => "DS",
+            Self::Wii => "Wii",
+            Self::TDS => "3DS",
+            Self::Tour => "Tour",
+            Self::MK8 => "MK8",
+        }.fmt(f)
+    }
+}
+
 /// Defines a coordinate in the selection screen: row and column give a cup, and position is the
 /// number of the course in that cup.
-#[derive(Serialize, Deserialize, Debug, Clone)]
+#[derive(Debug, Clone, Copy, Serialize, Deserialize)]
 pub struct Coord {
     row: u8,
     col: u8,
@@ -32,6 +65,8 @@ impl Display for Coord {
 pub struct Course {
     /// The course's name, e.g. "Rainbow Road."
     pub name: String,
+    /// The game from which the course originated.
+    pub origin: Origin,
     /// The course's position in the selection screen.
     pub coord: Coord,
     /// The course's rank quality ranking relative to other courses. This should be unique,
@@ -43,9 +78,10 @@ pub struct Course {
 impl Course {
     /// Create a new course.
     #[allow(unused)]
-    pub fn new(rank: usize, coord: Coord, name: &str) -> Self {
+    pub fn new(rank: usize, coord: Coord, origin: Origin, name: &str) -> Self {
         Course {
             name: name.to_owned(),
+            origin,
             coord,
             rank,
         }
@@ -54,7 +90,14 @@ impl Course {
 
 impl Display for Course {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "({}, {:02}) {}", self.coord, self.rank, self.name)
+        write!(
+            f,
+            "({coord}, {rank:02}) {origin:<4} {name}",
+            coord = self.coord,
+            rank = self.rank,
+            origin = self.origin,
+            name = self.name,
+        )
     }
 }
 

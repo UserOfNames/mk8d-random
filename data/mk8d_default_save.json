@@ -1,7 +1,8 @@
 {
   "courses": [
     {
-      "name": "Wii  Coconut Mall",
+      "name": "Coconut Mall",
+      "origin": "Wii",
       "coord": {
         "row": 3,
         "col": 1,
@@ -10,7 +11,8 @@
       "rank": 1
     },
     {
-      "name": "Wii  Maple Treeway",
+      "name": "Maple Treeway",
+      "origin": "Wii",
       "coord": {
         "row": 3,
         "col": 5,
@@ -19,7 +21,8 @@
       "rank": 2
     },
     {
-      "name": "Wii  Moo Moo Meadows",
+      "name": "Moo Moo Meadows",
+      "origin": "Wii",
       "coord": {
         "row": 2,
         "col": 1,
@@ -28,7 +31,8 @@
       "rank": 3
     },
     {
-      "name": "MK8  Squeaky Clean Sprint",
+      "name": "Squeaky Clean Sprint",
+      "origin": "MK8",
       "coord": {
         "row": 4,
         "col": 3,
@@ -37,7 +41,8 @@
       "rank": 4
     },
     {
-      "name": "DS   Tick Tock Clock",
+      "name": "Tick Tock Clock",
+      "origin": "DS",
       "coord": {
         "row": 2,
         "col": 4,
@@ -46,7 +51,8 @@
       "rank": 5
     },
     {
-      "name": "DS   Peach Gardens",
+      "name": "Peach Gardens",
+      "origin": "DS",
       "coord": {
         "row": 3,
         "col": 6,
@@ -55,7 +61,8 @@
       "rank": 6
     },
     {
-      "name": "Wii  Moonview Highway",
+      "name": "Moonview Highway",
+      "origin": "Wii",
       "coord": {
         "row": 4,
         "col": 3,
@@ -64,7 +71,8 @@
       "rank": 7
     },
     {
-      "name": "Wii  DK Summit",
+      "name": "DK Summit",
+      "origin": "Wii",
       "coord": {
         "row": 4,
         "col": 1,
@@ -73,7 +81,8 @@
       "rank": 8
     },
     {
-      "name": "MK8  Ice Ice Outpost",
+      "name": "Ice Ice Outpost",
+      "origin": "MK8",
       "coord": {
         "row": 2,
         "col": 5,
@@ -82,7 +91,8 @@
       "rank": 9
     },
     {
-      "name": "3DS  Rock Rock Mountain",
+      "name": "Rock Rock Mountain",
+      "origin": "TDS",
       "coord": {
         "row": 3,
         "col": 5,
@@ -91,7 +101,8 @@
       "rank": 10
     },
     {
-      "name": "GCN  Sherbet Land",
+      "name": "Sherbet Land",
+      "origin": "GCN",
       "coord": {
         "row": 2,
         "col": 3,
@@ -100,7 +111,8 @@
       "rank": 11
     },
     {
-      "name": "MK8  Sky-High Sundae",
+      "name": "Sky-High Sundae",
+      "origin": "MK8",
       "coord": {
         "row": 3,
         "col": 4,
@@ -109,7 +121,8 @@
       "rank": 12
     },
     {
-      "name": "MK8  Cloudtop Cruise",
+      "name": "Cloudtop Cruise",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 4,
@@ -118,7 +131,8 @@
       "rank": 13
     },
     {
-      "name": "DS   Waluigi Pinball",
+      "name": "Waluigi Pinball",
+      "origin": "DS",
       "coord": {
         "row": 3,
         "col": 3,
@@ -127,7 +141,8 @@
       "rank": 14
     },
     {
-      "name": "N64  Rainbow Road",
+      "name": "Rainbow Road",
+      "origin": "N64",
       "coord": {
         "row": 2,
         "col": 4,
@@ -136,7 +151,8 @@
       "rank": 15
     },
     {
-      "name": "Wii  Rainbow Road",
+      "name": "Rainbow Road",
+      "origin": "Wii",
       "coord": {
         "row": 4,
         "col": 6,
@@ -145,7 +161,8 @@
       "rank": 16
     },
     {
-      "name": "Wii  Koopa Cape",
+      "name": "Koopa Cape",
+      "origin": "Wii",
       "coord": {
         "row": 4,
         "col": 4,
@@ -154,7 +171,8 @@
       "rank": 17
     },
     {
-      "name": "3DS  Music Park",
+      "name": "Music Park",
+      "origin": "TDS",
       "coord": {
         "row": 2,
         "col": 3,
@@ -163,7 +181,8 @@
       "rank": 18
     },
     {
-      "name": "N64  Yoshi Valley",
+      "name": "Yoshi Valley",
+      "origin": "N64",
       "coord": {
         "row": 2,
         "col": 3,
@@ -172,7 +191,8 @@
       "rank": 19
     },
     {
-      "name": "Wii  Mushroom Gorge",
+      "name": "Mushroom Gorge",
+      "origin": "Wii",
       "coord": {
         "row": 3,
         "col": 4,
@@ -181,7 +201,8 @@
       "rank": 20
     },
     {
-      "name": "MK8  Mount Wario",
+      "name": "Mount Wario",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 3,
@@ -190,7 +211,8 @@
       "rank": 21
     },
     {
-      "name": "MK8  Sunshine Airport",
+      "name": "Sunshine Airport",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 3,
@@ -199,7 +221,8 @@
       "rank": 22
     },
     {
-      "name": "N64  Toad's Turnpike",
+      "name": "Toad's Turnpike",
+      "origin": "N64",
       "coord": {
         "row": 2,
         "col": 1,
@@ -208,7 +231,8 @@
       "rank": 23
     },
     {
-      "name": "MK8  Electrodrome",
+      "name": "Electrodrome",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 3,
@@ -217,7 +241,8 @@
       "rank": 24
     },
     {
-      "name": "DS   Shroom Ridge",
+      "name": "Shroom Ridge",
+      "origin": "DS",
       "coord": {
         "row": 3,
         "col": 2,
@@ -226,7 +251,8 @@
       "rank": 25
     },
     {
-      "name": "3DS  Rainbow Road",
+      "name": "Rainbow Road",
+      "origin": "TDS",
       "coord": {
         "row": 3,
         "col": 6,
@@ -235,7 +261,8 @@
       "rank": 26
     },
     {
-      "name": "Wii  Wario's Gold Mine",
+      "name": "Wario's Gold Mine",
+      "origin": "Wii",
       "coord": {
         "row": 2,
         "col": 5,
@@ -244,7 +271,8 @@
       "rank": 27
     },
     {
-      "name": "N64  Kalimari Desert",
+      "name": "Kalimari Desert",
+      "origin": "N64",
       "coord": {
         "row": 3,
         "col": 3,
@@ -253,7 +281,8 @@
       "rank": 28
     },
     {
-      "name": "Wii  Daisy Circuit",
+      "name": "Daisy Circuit",
+      "origin": "Wii",
       "coord": {
         "row": 4,
         "col": 5,
@@ -262,7 +291,8 @@
       "rank": 29
     },
     {
-      "name": "GCN  Daisy Cruiser",
+      "name": "Daisy Cruiser",
+      "origin": "GCN",
       "coord": {
         "row": 4,
         "col": 3,
@@ -271,7 +301,8 @@
       "rank": 30
     },
     {
-      "name": "GBA  Sky Garden",
+      "name": "Sky Garden",
+      "origin": "GBA",
       "coord": {
         "row": 3,
         "col": 2,
@@ -280,7 +311,8 @@
       "rank": 31
     },
     {
-      "name": "MK8  Bowser's Castle",
+      "name": "Bowser's Castle",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 4,
@@ -289,7 +321,8 @@
       "rank": 32
     },
     {
-      "name": "Tour Ninja Hideaway",
+      "name": "Ninja Hideaway",
+      "origin": "Tour",
       "coord": {
         "row": 3,
         "col": 2,
@@ -298,7 +331,8 @@
       "rank": 33
     },
     {
-      "name": "MK8  Big Blue",
+      "name": "Big Blue",
+      "origin": "MK8",
       "coord": {
         "row": 2,
         "col": 6,
@@ -307,7 +341,8 @@
       "rank": 34
     },
     {
-      "name": "MK8  Toad Harbor",
+      "name": "Toad Harbor",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 2,
@@ -316,7 +351,8 @@
       "rank": 35
     },
     {
-      "name": "MK8  Mute City",
+      "name": "Mute City",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 5,
@@ -325,7 +361,8 @@
       "rank": 36
     },
     {
-      "name": "MK8  Super Bell Subway",
+      "name": "Super Bell Subway",
+      "origin": "MK8",
       "coord": {
         "row": 2,
         "col": 6,
@@ -334,7 +371,8 @@
       "rank": 37
     },
     {
-      "name": "GCN  DK Mountain",
+      "name": "DK Mountain",
+      "origin": "GCN",
       "coord": {
         "row": 4,
         "col": 5,
@@ -343,7 +381,8 @@
       "rank": 38
     },
     {
-      "name": "MK8  Thwomp Ruins",
+      "name": "Thwomp Ruins",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 1,
@@ -352,7 +391,8 @@
       "rank": 39
     },
     {
-      "name": "3DS  Rosalina's Ice World",
+      "name": "Rosalina's Ice World",
+      "origin": "TDS",
       "coord": {
         "row": 4,
         "col": 6,
@@ -361,7 +401,8 @@
       "rank": 40
     },
     {
-      "name": "MK8  Wild Woods",
+      "name": "Wild Woods",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 6,
@@ -370,7 +411,8 @@
       "rank": 41
     },
     {
-      "name": "MK8  Yoshi's Island",
+      "name": "Yoshi's Island",
+      "origin": "MK8",
       "coord": {
         "row": 4,
         "col": 1,
@@ -379,7 +421,8 @@
       "rank": 42
     },
     {
-      "name": "3DS  Piranha Plant Slide",
+      "name": "Piranha Plant Slide",
+      "origin": "TDS",
       "coord": {
         "row": 2,
         "col": 4,
@@ -388,7 +431,8 @@
       "rank": 43
     },
     {
-      "name": "DS   Cheep Cheep Beach",
+      "name": "Cheep Cheep Beach",
+      "origin": "DS",
       "coord": {
         "row": 2,
         "col": 1,
@@ -397,7 +441,8 @@
       "rank": 44
     },
     {
-      "name": "MK8  Hyrule Circuit",
+      "name": "Hyrule Circuit",
+      "origin": "MK8",
       "coord": {
         "row": 2,
         "col": 5,
@@ -406,7 +451,8 @@
       "rank": 45
     },
     {
-      "name": "Wii  Grumble Volcano",
+      "name": "Grumble Volcano",
+      "origin": "Wii",
       "coord": {
         "row": 2,
         "col": 4,
@@ -415,7 +461,8 @@
       "rank": 46
     },
     {
-      "name": "MK8  Dragon Driftway",
+      "name": "Dragon Driftway",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 5,
@@ -424,7 +471,8 @@
       "rank": 47
     },
     {
-      "name": "MK8  Rainbow Road",
+      "name": "Rainbow Road",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 4,
@@ -433,7 +481,8 @@
       "rank": 48
     },
     {
-      "name": "Tour Merry Mountain",
+      "name": "Merry Mountain",
+      "origin": "Tour",
       "coord": {
         "row": 3,
         "col": 6,
@@ -442,7 +491,8 @@
       "rank": 49
     },
     {
-      "name": "3DS  DK Jungle",
+      "name": "DK Jungle",
+      "origin": "TDS",
       "coord": {
         "row": 2,
         "col": 2,
@@ -451,7 +501,8 @@
       "rank": 50
     },
     {
-      "name": "3DS  Toad Circuit",
+      "name": "Toad Circuit",
+      "origin": "TDS",
       "coord": {
         "row": 3,
         "col": 1,
@@ -460,7 +511,8 @@
       "rank": 51
     },
     {
-      "name": "MK8  Dolphin Shoals",
+      "name": "Dolphin Shoals",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 3,
@@ -469,7 +521,8 @@
       "rank": 52
     },
     {
-      "name": "GCN  Waluigi Stadium",
+      "name": "Waluigi Stadium",
+      "origin": "GCN",
       "coord": {
         "row": 4,
         "col": 2,
@@ -478,7 +531,8 @@
       "rank": 53
     },
     {
-      "name": "MK8  Water Park",
+      "name": "Water Park",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 1,
@@ -487,7 +541,8 @@
       "rank": 54
     },
     {
-      "name": "N64  Royal Raceway",
+      "name": "Royal Raceway",
+      "origin": "N64",
       "coord": {
         "row": 2,
         "col": 2,
@@ -496,7 +551,8 @@
       "rank": 55
     },
     {
-      "name": "Tour Bangkok Rush",
+      "name": "Bangkok Rush",
+      "origin": "Tour",
       "coord": {
         "row": 4,
         "col": 2,
@@ -505,7 +561,8 @@
       "rank": 56
     },
     {
-      "name": "MK8  Twisted Mansion",
+      "name": "Twisted Mansion",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 2,
@@ -514,7 +571,8 @@
       "rank": 57
     },
     {
-      "name": "GBA  Snow Land",
+      "name": "Snow Land",
+      "origin": "GBA",
       "coord": {
         "row": 3,
         "col": 4,
@@ -523,7 +581,8 @@
       "rank": 58
     },
     {
-      "name": "MK8  Shy Guy Falls",
+      "name": "Shy Guy Falls",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 2,
@@ -532,7 +591,8 @@
       "rank": 59
     },
     {
-      "name": "MK8  Piranha Plant Cove",
+      "name": "Piranha Plant Cove",
+      "origin": "MK8",
       "coord": {
         "row": 4,
         "col": 5,
@@ -541,7 +601,8 @@
       "rank": 60
     },
     {
-      "name": "GBA  Ribbon Road",
+      "name": "Ribbon Road",
+      "origin": "GBA",
       "coord": {
         "row": 2,
         "col": 6,
@@ -550,7 +611,8 @@
       "rank": 61
     },
     {
-      "name": "Tour Madrid Drive",
+      "name": "Madrid Drive",
+      "origin": "Tour",
       "coord": {
         "row": 4,
         "col": 6,
@@ -559,7 +621,8 @@
       "rank": 62
     },
     {
-      "name": "Tour Singapore Speedway",
+      "name": "Singapore Speedway",
+      "origin": "Tour",
       "coord": {
         "row": 4,
         "col": 2,
@@ -568,7 +631,8 @@
       "rank": 63
     },
     {
-      "name": "SNES Bowser's Castle 3",
+      "name": "Bowser's Castle 3",
+      "origin": "SNES",
       "coord": {
         "row": 4,
         "col": 6,
@@ -577,7 +641,8 @@
       "rank": 64
     },
     {
-      "name": "Tour Vancouver Velocity",
+      "name": "Vancouver Velocity",
+      "origin": "Tour",
       "coord": {
         "row": 4,
         "col": 4,
@@ -586,7 +651,8 @@
       "rank": 65
     },
     {
-      "name": "MK8  Excitebike Arena",
+      "name": "Excitebike Arena",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 5,
@@ -595,7 +661,8 @@
       "rank": 66
     },
     {
-      "name": "MK8  Animal Crossing Circuit",
+      "name": "Animal Crossing Circuit",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 6,
@@ -604,7 +671,8 @@
       "rank": 67
     },
     {
-      "name": "MK8  Sweet Sweet Canyon",
+      "name": "Sweet Sweet Canyon",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 1,
@@ -613,7 +681,8 @@
       "rank": 68
     },
     {
-      "name": "Tour New York Minute",
+      "name": "New York Minute",
+      "origin": "Tour",
       "coord": {
         "row": 3,
         "col": 3,
@@ -622,7 +691,8 @@
       "rank": 69
     },
     {
-      "name": "MK8  Mario Kart Stadium",
+      "name": "Mario Kart Stadium",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 1,
@@ -631,7 +701,8 @@
       "rank": 70
     },
     {
-      "name": "GBA  Sunset Wilds",
+      "name": "Sunset Wilds",
+      "origin": "GBA",
       "coord": {
         "row": 4,
         "col": 4,
@@ -640,7 +711,8 @@
       "rank": 71
     },
     {
-      "name": "Tour Rome Avanti",
+      "name": "Rome Avanti",
+      "origin": "Tour",
       "coord": {
         "row": 4,
         "col": 5,
@@ -649,7 +721,8 @@
       "rank": 72
     },
     {
-      "name": "Tour Berlin Byways",
+      "name": "Berlin Byways",
+      "origin": "Tour",
       "coord": {
         "row": 3,
         "col": 6,
@@ -658,7 +731,8 @@
       "rank": 73
     },
     {
-      "name": "GBA  Riverside Park",
+      "name": "Riverside Park",
+      "origin": "GBA",
       "coord": {
         "row": 4,
         "col": 1,
@@ -667,7 +741,8 @@
       "rank": 74
     },
     {
-      "name": "SNES Rainbow Road",
+      "name": "Rainbow Road",
+      "origin": "SNES",
       "coord": {
         "row": 2,
         "col": 5,
@@ -676,7 +751,8 @@
       "rank": 75
     },
     {
-      "name": "Tour Paris Promenade",
+      "name": "Paris Promenade",
+      "origin": "Tour",
       "coord": {
         "row": 3,
         "col": 1,
@@ -685,7 +761,8 @@
       "rank": 76
     },
     {
-      "name": "MK8  Mario Circuit",
+      "name": "Mario Circuit",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 2,
@@ -694,7 +771,8 @@
       "rank": 77
     },
     {
-      "name": "GBA  Mario Circuit",
+      "name": "Mario Circuit",
+      "origin": "GBA",
       "coord": {
         "row": 2,
         "col": 1,
@@ -703,7 +781,8 @@
       "rank": 78
     },
     {
-      "name": "SNES Mario Circuit 3",
+      "name": "Mario Circuit 3",
+      "origin": "SNES",
       "coord": {
         "row": 3,
         "col": 3,
@@ -712,7 +791,8 @@
       "rank": 79
     },
     {
-      "name": "DS   Mario Circuit",
+      "name": "Mario Circuit",
+      "origin": "DS",
       "coord": {
         "row": 4,
         "col": 2,
@@ -721,7 +801,8 @@
       "rank": 80
     },
     {
-      "name": "GBA  Boo Lake",
+      "name": "Boo Lake",
+      "origin": "GBA",
       "coord": {
         "row": 3,
         "col": 5,
@@ -730,7 +811,8 @@
       "rank": 81
     },
     {
-      "name": "GCN  Dry Dry Desert",
+      "name": "Dry Dry Desert",
+      "origin": "GCN",
       "coord": {
         "row": 2,
         "col": 2,
@@ -739,7 +821,8 @@
       "rank": 82
     },
     {
-      "name": "Tour Athens Dash",
+      "name": "Athens Dash",
+      "origin": "Tour",
       "coord": {
         "row": 4,
         "col": 3,
@@ -748,7 +831,8 @@
       "rank": 83
     },
     {
-      "name": "N64  Choco Mountain",
+      "name": "Choco Mountain",
+      "origin": "N64",
       "coord": {
         "row": 3,
         "col": 1,
@@ -757,7 +841,8 @@
       "rank": 84
     },
     {
-      "name": "SNES Donut Plains 3",
+      "name": "Donut Plains 3",
+      "origin": "SNES",
       "coord": {
         "row": 2,
         "col": 2,
@@ -766,7 +851,8 @@
       "rank": 85
     },
     {
-      "name": "Tour Los Angeles Laps",
+      "name": "Los Angeles Laps",
+      "origin": "Tour",
       "coord": {
         "row": 4,
         "col": 4,
@@ -775,7 +861,8 @@
       "rank": 86
     },
     {
-      "name": "Tour Amsterdam Drift",
+      "name": "Amsterdam Drift",
+      "origin": "Tour",
       "coord": {
         "row": 4,
         "col": 1,
@@ -784,7 +871,8 @@
       "rank": 87
     },
     {
-      "name": "MK8  Bone Dry Ruins",
+      "name": "Bone Dry Ruins",
+      "origin": "MK8",
       "coord": {
         "row": 1,
         "col": 4,
@@ -793,7 +881,8 @@
       "rank": 88
     },
     {
-      "name": "Tour London Loop",
+      "name": "London Loop",
+      "origin": "Tour",
       "coord": {
         "row": 3,
         "col": 5,
@@ -802,7 +891,8 @@
       "rank": 89
     },
     {
-      "name": "3DS  Neo Bowser City",
+      "name": "Neo Bowser City",
+      "origin": "TDS",
       "coord": {
         "row": 2,
         "col": 6,
@@ -811,7 +901,8 @@
       "rank": 90
     },
     {
-      "name": "DS   Wario Stadium",
+      "name": "Wario Stadium",
+      "origin": "DS",
       "coord": {
         "row": 2,
         "col": 3,
@@ -820,7 +911,8 @@
       "rank": 91
     },
     {
-      "name": "GCN  Yoshi's Circuit",
+      "name": "Yoshi's Circuit",
+      "origin": "GCN",
       "coord": {
         "row": 1,
         "col": 5,
@@ -829,7 +921,8 @@
       "rank": 92
     },
     {
-      "name": "GCN  Baby Park",
+      "name": "Baby Park",
+      "origin": "GCN",
       "coord": {
         "row": 1,
         "col": 6,
@@ -838,7 +931,8 @@
       "rank": 93
     },
     {
-      "name": "Tour Sydney Sprint",
+      "name": "Sydney Sprint",
+      "origin": "Tour",
       "coord": {
         "row": 3,
         "col": 4,
@@ -847,7 +941,8 @@
       "rank": 94
     },
     {
-      "name": "Tour Tokyo Blur",
+      "name": "Tokyo Blur",
+      "origin": "Tour",
       "coord": {
         "row": 3,
         "col": 2,
@@ -856,7 +951,8 @@
       "rank": 95
     },
     {
-      "name": "GBA  Cheese Land",
+      "name": "Cheese Land",
+      "origin": "GBA",
       "coord": {
         "row": 1,
         "col": 6,
